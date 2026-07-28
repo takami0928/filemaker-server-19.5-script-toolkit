@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "target": "FileMaker Pro 19.5 / FileMaker Server 19.5",
   "policy": "deny-by-default",
   "steps": [
@@ -6,49 +7,176 @@
       "ir": "comment",
       "name": "# (comment)",
       "id": 89,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified"
+      ]
     },
     {
       "ir": "set_error_capture",
       "name": "Set Error Capture",
       "id": 86,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "documented",
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified",
+        "fmse_verified"
+      ]
     },
     {
       "ir": "set_variable",
       "name": "Set Variable",
       "id": 141,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "documented",
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified",
+        "fmse_verified"
+      ]
     },
     {
       "ir": "if",
       "name": "If",
       "id": 68,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "documented",
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified",
+        "fmse_verified"
+      ]
     },
     {
       "ir": "else",
       "name": "Else",
       "id": 69,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "documented",
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified",
+        "fmse_verified"
+      ]
     },
     {
       "ir": "end_if",
       "name": "End If",
       "id": 70,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "documented",
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified",
+        "fmse_verified"
+      ]
     },
     {
       "ir": "exit_script",
       "name": "Exit Script",
       "id": 103,
-      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+      "status": "experimental",
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "agentic-fm-public-implementation"
+      ],
+      "evidence": [
+        "documented",
+        "public_fixture_observed",
+        "structure_tested",
+        "clipboard_payload_tested"
+      ],
+      "missingEvidence": [
+        "fm19_5_paste_verified",
+        "fm19_5_runtime_verified",
+        "fmse_verified"
+      ]
     }
   ],
   "forbidden": [
-    "Open Transaction",
-    "Commit Transaction",
-    "Revert Transaction",
-    "Perform Script on Server with Callback"
+    {
+      "name": "Open Transaction",
+      "introducedIn": "19.6.1",
+      "reason": "Introduced after the 19.5 target",
+      "sourceIds": ["claris-open-transaction"],
+      "evidence": ["documented"]
+    },
+    {
+      "name": "Commit Transaction",
+      "introducedIn": "19.6.1",
+      "reason": "Introduced after the 19.5 target",
+      "sourceIds": ["claris-commit-transaction"],
+      "evidence": ["documented"]
+    },
+    {
+      "name": "Revert Transaction",
+      "introducedIn": "19.6.1",
+      "reason": "Introduced after the 19.5 target",
+      "sourceIds": ["claris-revert-transaction"],
+      "evidence": ["documented"]
+    },
+    {
+      "name": "Perform Script on Server with Callback",
+      "introducedIn": "20.1",
+      "reason": "Introduced after the 19.5 target",
+      "sourceIds": ["claris-psos-callback"],
+      "evidence": ["documented"]
+    }
   ]
 }
