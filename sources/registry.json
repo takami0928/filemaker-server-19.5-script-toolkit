@@ -68,6 +68,50 @@
       "status": "archived"
     },
     {
+      "id": "claris-open-transaction",
+      "title": "Open Transaction",
+      "url": "https://help.claris.com/en/pro-help/content/open-transaction.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 19.6.1",
+      "scope": "Proof that Open Transaction is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-commit-transaction",
+      "title": "Commit Transaction",
+      "url": "https://help.claris.com/en/pro-help/content/commit-transaction.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 19.6.1",
+      "scope": "Proof that Commit Transaction is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-revert-transaction",
+      "title": "Revert Transaction",
+      "url": "https://help.claris.com/en/pro-help/content/revert-transaction.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 19.6.1",
+      "scope": "Proof that Revert Transaction is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-psos-callback",
+      "title": "Perform Script On Server with Callback",
+      "url": "https://help.claris.com/en/pro-help/content/perform-script-on-server-callback.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 20.1",
+      "scope": "Proof that the callback script step is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
       "id": "microsoft-win32-clipboard",
       "title": "Using the Clipboard",
       "url": "https://learn.microsoft.com/en-us/windows/win32/dataxchg/using-the-clipboard",
