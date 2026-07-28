@@ -1,0 +1,48 @@
+{
+  "target": "FileMaker Server 19.5",
+  "kind": "script_steps",
+  "steps": [
+    {
+      "type": "comment",
+      "text": "Purpose: server-side skeleton; replace placeholders after resolving internal object names and IDs."
+    },
+    {
+      "type": "set_error_capture",
+      "state": true
+    },
+    {
+      "type": "set_variable",
+      "name": "$in",
+      "calculation": "Get ( ScriptParameter )",
+      "repetition": "1"
+    },
+    {
+      "type": "if",
+      "calculation": "IsEmpty ( $in )"
+    },
+    {
+      "type": "set_variable",
+      "name": "$out",
+      "calculation": "JSONSetElement ( \"{}\" ; [ \"ok\" ; 0 ; JSONBoolean ] ; [ \"code\" ; \"INVALID_PARAMETER\" ; JSONString ] )",
+      "repetition": "1"
+    },
+    {
+      "type": "exit_script",
+      "calculation": "$out"
+    },
+    {
+      "type": "else"
+    },
+    {
+      "type": "comment",
+      "text": "Continue with explicit server-side context setup and primary-key find."
+    },
+    {
+      "type": "end_if"
+    },
+    {
+      "type": "exit_script",
+      "calculation": "$out"
+    }
+  ]
+}

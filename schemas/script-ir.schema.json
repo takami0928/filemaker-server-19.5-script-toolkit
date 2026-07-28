@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/fms19/script-ir.schema.json",
+  "title": "FileMaker Server 19.5 conservative script-step IR",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target",
+    "kind",
+    "steps"
+  ],
+  "properties": {
+    "target": {
+      "const": "FileMaker Server 19.5"
+    },
+    "kind": {
+      "const": "script_steps"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "comment",
+              "set_error_capture",
+              "set_variable",
+              "if",
+              "else",
+              "end_if",
+              "exit_script"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string"
+          },
+          "state": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^\\$"
+          },
+          "calculation": {
+            "type": "string"
+          },
+          "repetition": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

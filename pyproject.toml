@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fms19-script-toolkit"
+version = "0.1.0"
+description = "Safe FileMaker Server 19.5 script XML and Windows clipboard toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "kouhei takami"}]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+]
+
+[project.scripts]
+fms19 = "fms19_toolkit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

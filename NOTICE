@@ -1,0 +1,15 @@
+FileMaker Server 19.5 Script Toolkit
+Copyright 2026 kouhei takami
+
+This product includes design knowledge and independently adapted code concepts from:
+
+  agentic-fm
+  Copyright 2026 Matt Petrowsky
+  https://github.com/petrowsky/agentic-fm
+  Licensed under the Apache License, Version 2.0.
+
+The Windows FileMaker clipboard format handling in this project was independently
+organized with reference to agentic-fm's public clipboard implementation. Modified
+files and this repository are not affiliated with or endorsed by Claris International Inc.
+
+FileMaker and Claris are trademarks of Claris International Inc.

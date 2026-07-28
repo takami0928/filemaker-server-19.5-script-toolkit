@@ -1,0 +1,54 @@
+{
+  "target": "FileMaker Pro 19.5 / FileMaker Server 19.5",
+  "policy": "deny-by-default",
+  "steps": [
+    {
+      "ir": "comment",
+      "name": "# (comment)",
+      "id": 89,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    },
+    {
+      "ir": "set_error_capture",
+      "name": "Set Error Capture",
+      "id": 86,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    },
+    {
+      "ir": "set_variable",
+      "name": "Set Variable",
+      "id": 141,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    },
+    {
+      "ir": "if",
+      "name": "If",
+      "id": 68,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    },
+    {
+      "ir": "else",
+      "name": "Else",
+      "id": 69,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    },
+    {
+      "ir": "end_if",
+      "name": "End If",
+      "id": 70,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    },
+    {
+      "ir": "exit_script",
+      "name": "Exit Script",
+      "id": 103,
+      "fixture_status": "public-fixture-reviewed; fm19.5-local-roundtrip-required"
+    }
+  ],
+  "forbidden": [
+    "Open Transaction",
+    "Commit Transaction",
+    "Revert Transaction",
+    "Perform Script on Server with Callback"
+  ]
+}
