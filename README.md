@@ -1,5 +1,7 @@
 # FileMaker Server 19.5 Script Toolkit
 
+[![CI](https://github.com/takami0928/filemaker-server-19.5-script-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/takami0928/filemaker-server-19.5-script-toolkit/actions/workflows/ci.yml)
+
 FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が**シンプル・保守可能・理解可能・安定動作**する形で実装するための、公開技術リファレンス兼スクリプト補助ツールです。
 
 このリポジトリは社内システムの仕様書ではありません。AIは社内文書からテーブル定義、フィールド、テーブルオカレンス、レイアウト、画面遷移、権限、業務要件を取得し、本リポジトリから「FileMaker Server 19.5でどう実装するか」を取得します。
