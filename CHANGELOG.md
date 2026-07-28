@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- 厳格なScript IR v2とDraft 2020-12 JSON Schemaを追加
+- 対象バージョン、実行環境、JSON契約、コンテキスト、変数、オブジェクト参照、リスク、設計・証拠状態を明示
+- 7種類の既存ステップを`additionalProperties: false`のdiscriminated unionへ変更
+- `fms19 validate-ir`と`fms19 migrate-ir`を追加
+- v1/v2自動判定とv1の決定的なメモリ内移行をレンダラーへ追加
+- 未解決FileMakerオブジェクト参照の内部ID捏造を防止し、XML生成を拒否
+- IRスキーマ、例、移行決定性をリポジトリポリシー検査へ追加
+- Windows／Linux CIでIR検証、移行、v1/v2レンダリングを実行
+- 標準JSON Schema検証のため`jsonschema>=4.23,<5`を追加
 - ロードマップ、品質ゲート、成熟度、Definition of Doneを追加
 - 出典ポリシーと機械可読な出典レジストリを追加
 - FileMaker証拠レベルと昇格規則を追加

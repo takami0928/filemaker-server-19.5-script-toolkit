@@ -4,7 +4,7 @@ This roadmap orders work by dependency and safety. Expanding XML coverage before
 
 ## Current state
 
-- Maturity: **M1 — safe proof of concept**
+- Maturity: **M2 — governed design and compilation**
 - Target: FileMaker Server 19.5 with FileMaker Pro 19.5 development on Windows
 - Policy: deny by default
 - Runtime evidence: not yet collected from FileMaker Pro or FileMaker Server 19.5
@@ -26,14 +26,14 @@ Exit condition: repository claims, evidence, and generated assets are governed b
 
 Tracking: #3. Blocked by Phase 0.
 
-- Versioned target and execution mode
-- Script input/output contracts
-- Declared variables and context
-- Strict per-step schemas
-- Unresolved FileMaker object references
-- Migration from the current minimal IR
+- [x] Versioned target and execution mode
+- [x] Script input/output contracts
+- [x] Declared variables and context
+- [x] Strict per-step schemas
+- [x] Unresolved FileMaker object references
+- [x] Migration from the current minimal IR
 
-Exit condition: invalid designs and invented object IDs cannot reach XML rendering.
+Exit condition: met by Issue #3 implementation. Invalid native v2 designs and unresolved object IDs cannot reach XML rendering; v1 compatibility uses a deterministic, explicitly incomplete migration model. Independent PR review and FileMaker hardware verification remain separate gates.
 
 ## Phase 2 — Fixture and round-trip pipeline
 

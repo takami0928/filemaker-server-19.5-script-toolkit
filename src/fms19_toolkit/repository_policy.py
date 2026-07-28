@@ -7,6 +7,9 @@ import re
 from typing import Any
 from urllib.parse import urlparse
 
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import SchemaError
+
 EVIDENCE_LEVELS = (
     "documented",
     "public_fixture_observed",
@@ -77,9 +80,15 @@ REQUIRED_PATHS = (
     "decisions/README.md",
     "decisions/0000-template.md",
     "decisions/0001-govern-source-evidence-and-generation.md",
+    "decisions/0002-script-ir-v2.md",
+    "docs/SCRIPT_IR.md",
+    "schemas/script-ir-v1.schema.json",
+    "schemas/script-ir-v2.schema.json",
+    "schemas/script-ir.schema.json",
     "schemas/source-registry.schema.json",
     "sources/registry.json",
     "catalog/fm19.5/verified-steps.json",
+    "examples/server-script-ir-v2.json",
 )
 
 
@@ -414,6 +423,72 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
         )
 
 
+def _validate_script_ir_artifacts(root: Path, errors: list[str]) -> None:
+    schema_paths = {
+        "v1": root / "schemas/script-ir-v1.schema.json",
+        "v2": root / "schemas/script-ir-v2.schema.json",
+        "current": root / "schemas/script-ir.schema.json",
+    }
+    schemas: dict[str, Any] = {}
+    for label, path in schema_paths.items():
+        schema = _load_json(path, errors)
+        if schema is None:
+            continue
+        schemas[label] = schema
+        try:
+            Draft202012Validator.check_schema(schema)
+        except SchemaError as exc:
+            errors.append(f"{path}: invalid Draft 2020-12 schema: {exc.message}")
+
+    current = schemas.get("current")
+    if isinstance(current, dict) and current.get("$ref") != "script-ir-v2.schema.json":
+        errors.append(
+            "schemas/script-ir.schema.json: current schema must reference "
+            "script-ir-v2.schema.json"
+        )
+
+    v2 = schemas.get("v2")
+    if isinstance(v2, dict):
+        if v2.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
+            errors.append("script-ir-v2 schema must use JSON Schema Draft 2020-12")
+        if v2.get("properties", {}).get("schemaVersion", {}).get("const") != 2:
+            errors.append("script-ir-v2 schema must require schemaVersion 2")
+
+    v1_example = _load_json(root / "examples/server-script-ir.json", errors)
+    v2_example = _load_json(root / "examples/server-script-ir-v2.json", errors)
+    try:
+        from fms19_toolkit.script_ir import (
+            dumps_ir,
+            migrate_v1_to_v2,
+            validate_ir,
+        )
+    except ImportError as exc:
+        errors.append(f"unable to import Script IR validation: {exc}")
+        return
+
+    if isinstance(v1_example, dict):
+        try:
+            validate_ir(v1_example, version=1)
+            first = dumps_ir(migrate_v1_to_v2(v1_example))
+            second = dumps_ir(migrate_v1_to_v2(v1_example))
+            if first != second:
+                errors.append("Script IR v1 migration must be deterministic")
+            migrated = json.loads(first)
+            if any(
+                "internalId" in reference
+                for reference in migrated.get("objectReferences", [])
+            ):
+                errors.append("Script IR v1 migration must not fabricate internal IDs")
+        except (RuntimeError, ValueError) as exc:
+            errors.append(f"examples/server-script-ir.json: {exc}")
+
+    if isinstance(v2_example, dict):
+        try:
+            validate_ir(v2_example, version=2)
+        except (RuntimeError, ValueError) as exc:
+            errors.append(f"examples/server-script-ir-v2.json: {exc}")
+
+
 def check_repository(root: str | Path) -> list[str]:
     root_path = Path(root).resolve()
     errors: list[str] = []
@@ -423,4 +498,5 @@ def check_repository(root: str | Path) -> list[str]:
     _load_json(root_path / "schemas/source-registry.schema.json", errors)
     known_sources = _validate_source_registry(root_path, errors)
     _validate_step_catalog(root_path, known_sources, errors)
+    _validate_script_ir_artifacts(root_path, errors)
     return errors

@@ -4,6 +4,7 @@ from html import escape
 import json
 from pathlib import Path
 
+from .script_ir import ensure_renderable_v2, normalize_ir_to_v2
 from .snippet import validate_snippet_text
 
 STEP_IDS = {
@@ -71,18 +72,12 @@ def render_step(step: dict) -> list[str]:
 
 
 def render_ir(data: dict) -> str:
-    if data.get("target") != "FileMaker Server 19.5":
-        raise ValueError('target must be exactly "FileMaker Server 19.5"')
-    if data.get("kind", "script_steps") != "script_steps":
-        raise ValueError('kind must be "script_steps"')
-    steps = data.get("steps")
-    if not isinstance(steps, list) or not steps:
-        raise ValueError("steps must be a non-empty array")
+    normalized = normalize_ir_to_v2(data)
+    ensure_renderable_v2(normalized)
+    steps = normalized["steps"]
 
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<fmxmlsnippet type="FMObjectList">']
     for step in steps:
-        if not isinstance(step, dict):
-            raise ValueError("every step must be an object")
         lines.extend(render_step(step))
     lines.append("</fmxmlsnippet>")
     xml = "\n".join(lines) + "\n"

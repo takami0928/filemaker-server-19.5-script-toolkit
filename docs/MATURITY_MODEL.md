@@ -13,13 +13,13 @@ The maturity level describes the repository as a whole. Individual steps and pat
 - XML structure and Windows payload can be checked automatically.
 - FileMaker Pro/Server evidence is incomplete.
 
-Current repository level at the start of Issue #2.
-
 ## M2 — Governed design and compilation
 
 - Evidence model, source policy, Definition of Done, and quality gates are enforced.
 - Strict IR represents execution mode, contracts, context, variables, and object references.
-- Invalid or unresolved designs fail before XML output.
+- Invalid native v2 designs and unresolved FileMaker object references fail before XML output; legacy v1 rendering retains explicit migration limitations.
+
+Current repository level after the governance foundation and strict Script IR v2 work through Issue #3.
 
 ## M3 — Fixture-backed compiler
 

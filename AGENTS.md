@@ -8,14 +8,15 @@ This repository is a public FileMaker Server 19.5 implementation reference and s
 2. [Roadmap](ROADMAP.md)
 3. [Quality gates](QUALITY_GATES.md)
 4. [AI usage contract](AI_GUIDE.md)
-5. [Evidence model](docs/EVIDENCE_MODEL.md)
-6. [Source policy](docs/SOURCE_POLICY.md)
-7. [Definition of Done](docs/DEFINITION_OF_DONE.md)
-8. [FileMaker Server 19.5 execution boundary](docs/FM_SERVER_19_5.md)
-9. [Script style](docs/SCRIPT_STYLE.md)
-10. [Server execution design](docs/SERVER_EXECUTION.md)
-11. [XML and clipboard](docs/XML_CLIPBOARD.md)
-12. [Validation status](docs/VALIDATION_STATUS.md)
+5. [Script IR](docs/SCRIPT_IR.md)
+6. [Evidence model](docs/EVIDENCE_MODEL.md)
+7. [Source policy](docs/SOURCE_POLICY.md)
+8. [Definition of Done](docs/DEFINITION_OF_DONE.md)
+9. [FileMaker Server 19.5 execution boundary](docs/FM_SERVER_19_5.md)
+10. [Script style](docs/SCRIPT_STYLE.md)
+11. [Server execution design](docs/SERVER_EXECUTION.md)
+12. [XML and clipboard](docs/XML_CLIPBOARD.md)
+13. [Validation status](docs/VALIDATION_STATUS.md)
 
 Treat internal company documents as the source of facts about the target system. Treat this repository as the source of implementation rules. Do not invent tables, fields, table occurrences, layouts, scripts, privileges, or internal FileMaker object IDs.
 
@@ -61,9 +62,14 @@ Use only steps registered in `catalog/fm19.5/verified-steps.json`. Unknown XML m
 python -m pip install -e .
 python scripts/check_repository.py
 python -m unittest discover -s tests -v
+fms19 validate-ir examples/server-script-ir-v2.json
+fms19 migrate-ir examples/server-script-ir.json migrated-ir-v2.json
+fms19 validate-ir migrated-ir-v2.json
 fms19 lint examples/server-script-steps.xml
-fms19 render examples/server-script-ir.json generated.xml
-fms19 lint generated.xml
+fms19 render examples/server-script-ir.json generated-v1.xml
+fms19 render examples/server-script-ir-v2.json generated-v2.xml
+fms19 lint generated-v1.xml
+fms19 lint generated-v2.xml
 ```
 
 ## Completion reporting
