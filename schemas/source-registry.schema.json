@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/fms19/source-registry.schema.json",
+  "title": "FileMaker Server 19.5 source registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "sources"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "url",
+          "sourceType",
+          "publisher",
+          "targetVersion",
+          "scope",
+          "retrievedAt",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "title": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "pattern": "^https://"},
+          "sourceType": {"enum": ["primary", "secondary"]},
+          "publisher": {"type": "string", "minLength": 1},
+          "targetVersion": {"type": "string", "minLength": 1},
+          "scope": {"type": "string", "minLength": 1},
+          "retrievedAt": {"type": "string", "format": "date"},
+          "status": {"enum": ["active", "archived", "superseded", "unavailable"]},
+          "notes": {"type": "string"}
+        }
+      }
+    }
+  }
+}

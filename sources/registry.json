@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "id": "claris-fm19-running-scripts-on-server",
+      "title": "Running scripts on FileMaker Server and FileMaker Cloud",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/running-scripts-on-server.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker 19",
+      "scope": "FMSE session behavior, server compatibility, and server-side script limitations",
+      "retrievedAt": "2026-07-28",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-script-steps-reference",
+      "title": "FileMaker Pro 19 script steps reference",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/script-steps-reference.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19",
+      "scope": "Script step names, behavior, options, and compatibility",
+      "retrievedAt": "2026-07-28",
+      "status": "archived"
+    },
+    {
+      "id": "claris-perform-script-on-server",
+      "title": "Perform Script on Server",
+      "url": "https://help.claris.com/en/pro-help/content/perform-script-on-server.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Current documentation; 19.5 applicability must be checked against archived sources",
+      "scope": "PSOS parameters, wait behavior, result handling, and execution model",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-fm19-server-script-schedule",
+      "title": "Running FileMaker scripts as scheduled tasks",
+      "url": "https://help.claris.com/archive/fm19/en/server-help/content/schedule-run-fm-script.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Server 19",
+      "scope": "FileMaker script schedule execution and configuration",
+      "retrievedAt": "2026-07-28",
+      "status": "archived"
+    },
+    {
+      "id": "claris-copy-paste-scripts",
+      "title": "Copying and pasting scripts",
+      "url": "https://help.claris.com/en/pro-help/content/copying-pasting-scripts.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Current documentation; XML/clipboard details require 19.5 fixture evidence",
+      "scope": "Supported FileMaker Pro script copy and paste workflow",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-fm19-save-copy-as-xml",
+      "title": "Saving a copy of a FileMaker Pro file as XML",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/save-a-copy-as-xml.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19",
+      "scope": "XML representation of FileMaker file structure and version caveats",
+      "retrievedAt": "2026-07-28",
+      "status": "archived"
+    },
+    {
+      "id": "claris-open-transaction",
+      "title": "Open Transaction",
+      "url": "https://help.claris.com/en/pro-help/content/open-transaction.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 19.6.1",
+      "scope": "Proof that Open Transaction is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-commit-transaction",
+      "title": "Commit Transaction",
+      "url": "https://help.claris.com/en/pro-help/content/commit-transaction.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 19.6.1",
+      "scope": "Proof that Commit Transaction is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-revert-transaction",
+      "title": "Revert Transaction",
+      "url": "https://help.claris.com/en/pro-help/content/revert-transaction.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 19.6.1",
+      "scope": "Proof that Revert Transaction is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "claris-psos-callback",
+      "title": "Perform Script On Server with Callback",
+      "url": "https://help.claris.com/en/pro-help/content/perform-script-on-server-callback.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Originated in FileMaker 20.1",
+      "scope": "Proof that the callback script step is unavailable in the 19.5 target",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "microsoft-win32-clipboard",
+      "title": "Using the Clipboard",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/dataxchg/using-the-clipboard",
+      "sourceType": "primary",
+      "publisher": "Microsoft",
+      "targetVersion": "Windows API",
+      "scope": "Win32 clipboard ownership, custom formats, and global memory handling",
+      "retrievedAt": "2026-07-28",
+      "status": "active"
+    },
+    {
+      "id": "agentic-fm-public-implementation",
+      "title": "agentic-fm public FileMaker XML and clipboard implementation",
+      "url": "https://github.com/petrowsky/agentic-fm",
+      "sourceType": "secondary",
+      "publisher": "Matt Petrowsky",
+      "targetVersion": "Not independently proven as FileMaker Pro 19.5",
+      "scope": "Public fmxmlsnippet examples and Windows clipboard implementation concepts",
+      "retrievedAt": "2026-07-28",
+      "status": "active",
+      "notes": "Useful for public fixture observation and implementation comparison; not sufficient for 19.5 paste/runtime evidence."
+    }
+  ]
+}

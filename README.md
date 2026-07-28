@@ -15,6 +15,7 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 - WindowsのFileMaker専用クリップボード形式への読み書き
 - JSON中間表現から検証済みXMLを生成する保守的なレンダラー
 - AIが実装案を出す際の固定手順と出力契約
+- 出典、証拠レベル、カタログ整合を検査するリポジトリ品質ゲート
 
 ## 対象
 
@@ -26,15 +27,18 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 
 ローカル単独ファイル、FileMaker 20以降の機能、レイアウトXML生成は初期対象外です。
 
-## 検証状態
+## 現在の成熟度
+
+現在は **M1 — safe proof of concept** です。
 
 - Python単体テスト: 実施済み
 - XML構造検査: 実施済み
 - Windowsペイロードのencode/decode往復: 実施済み
+- 出典ID、証拠レベル、カタログとコードの整合検査: 実施済み
 - FileMaker Pro 19.5実機での`copy → read → write → paste`: **未実施**
 - FileMaker Server 19.5上での実行: **未実施**
 
-実機往復が完了するまではアルファ版として扱い、生成XMLを本番ファイルへ直接貼り付けないでください。
+実機往復が完了するまではアルファ版として扱い、生成XMLを本番ファイルへ直接貼り付けないでください。成熟度の定義は[こちら](docs/MATURITY_MODEL.md)です。
 
 ## 重要な安全方針
 
@@ -44,6 +48,8 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 4. XMLは検証に合格しない限りクリップボードへ書き込まない。
 5. 貼り付け後はFileMaker Proの問題表示、参照先、互換性表示を確認する。
 6. 「XMLを生成できた」と「実環境で動作した」を区別する。
+7. CI成功をFileMaker実機証拠として扱わない。
+8. 互換性・動作上の主張は`sources/registry.json`の出典IDへ紐づける。
 
 ## クイックスタート
 
@@ -51,6 +57,9 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e .
+
+# リポジトリ品質ゲート
+python scripts/check_repository.py
 
 # XML検査
 fms19 lint examples/server-script-steps.xml
@@ -82,9 +91,20 @@ FileMaker Pro 19.5でホストファイルを開き、スクリプトワーク�
 - `End If`
 - `Exit Script`
 
-それ以外は、FileMaker Pro 19.5から取得した実物のXMLフィクスチャとテストを追加してから対応します。AIが未知のXMLを推測して生成することは想定していません。
+これらはすべて`experimental`です。自動テスト済みですが、FileMaker Pro 19.5への貼り付けおよびFileMaker Server 19.5での実行は未検証です。
 
-## ドキュメント
+それ以外は、FileMaker Pro 19.5から取得した実物XMLフィクスチャとテストを追加してから対応します。AIが未知のXMLを推測して生成することは想定していません。
+
+## 開発計画と品質基準
+
+- [ロードマップ](ROADMAP.md)
+- [品質ゲート](QUALITY_GATES.md)
+- [Definition of Done](docs/DEFINITION_OF_DONE.md)
+- [証拠モデル](docs/EVIDENCE_MODEL.md)
+- [出典ポリシー](docs/SOURCE_POLICY.md)
+- [Architecture Decision Records](decisions/README.md)
+
+## 技術ドキュメント
 
 - [目的と責任範囲](docs/PURPOSE.md)
 - [AI利用契約](AI_GUIDE.md)
