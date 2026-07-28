@@ -99,3 +99,25 @@ AI and tooling should use these user-facing states:
 - `fmse_verified`: maps directly to `fmse_verified`
 
 Unverified states must be shown explicitly rather than omitted.
+
+### Script IR v2 input boundary
+
+Script IR v2 is a design input, not a verification record. Its
+`status.evidence` field accepts only:
+
+- `unverified`
+- `design_ready`
+
+It does not accept `xml_generated`, `paste_verified`, `runtime_verified`, or
+`fmse_verified` as document assertions. In particular, a user-authored IR cannot
+prove that its own XML was generated or validated.
+
+If XML generation evidence is persisted in a future pipeline, it must be emitted
+by the renderer as a sidecar manifest containing at least the toolkit version,
+generation time, generated XML SHA-256, source IR SHA-256, and automated
+validation result. Until that manifest exists, command and CI results are
+transient `structure_tested` evidence only.
+
+FileMaker paste, client runtime, and FMSE states require separate verification
+records carrying the metadata defined above. They are never inferred from the
+Script IR, generated XML, code review, wheel installation, or CI success.

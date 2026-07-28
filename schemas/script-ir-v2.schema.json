@@ -104,22 +104,30 @@
           "unresolvedIssues": {
             "contains": {
               "required": [
-                "category"
+                "category",
+                "blocking"
               ],
               "properties": {
                 "category": {
                   "const": "target_execution"
+                },
+                "blocking": {
+                  "const": true
                 }
               }
             }
           },
           "status": {
             "required": [
-              "design"
+              "design",
+              "evidence"
             ],
             "properties": {
               "design": {
                 "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
               }
             }
           }
@@ -151,6 +159,218 @@
             "properties": {
               "execution": {
                 "const": "unspecified"
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "context"
+        ],
+        "properties": {
+          "context": {
+            "required": [
+              "mode"
+            ],
+            "properties": {
+              "mode": {
+                "const": "unspecified"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "context"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "script"
+        ],
+        "properties": {
+          "script": {
+            "required": [
+              "sideEffects"
+            ],
+            "properties": {
+              "sideEffects": {
+                "required": [
+                  "state"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "unspecified"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "script_metadata"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "variables"
+        ],
+        "properties": {
+          "variables": {
+            "contains": {
+              "anyOf": [
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "type": {
+                      "const": "unknown"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "initialization"
+                  ],
+                  "properties": {
+                    "initialization": {
+                      "required": [
+                        "method"
+                      ],
+                      "properties": {
+                        "method": {
+                          "const": "unspecified"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "variable"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
               }
             }
           }
@@ -817,11 +1037,7 @@
         "evidence": {
           "enum": [
             "unverified",
-            "design_ready",
-            "xml_generated",
-            "paste_verified",
-            "runtime_verified",
-            "fmse_verified"
+            "design_ready"
           ]
         }
       }

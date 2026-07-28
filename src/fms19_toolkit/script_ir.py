@@ -35,21 +35,29 @@ def _schema_directories() -> tuple[Path, ...]:
     return source_tree, installed_data
 
 
-@lru_cache(maxsize=2)
-def load_schema(version: int) -> dict[str, Any]:
+def _schema_filename(version: int) -> str:
     try:
-        filename = SCHEMA_FILES[version]
+        return SCHEMA_FILES[version]
     except KeyError as exc:
         raise ValueError(f"unsupported Script IR schema version: {version!r}") from exc
 
+
+def _locate_schema_path(version: int) -> Path:
+    filename = _schema_filename(version)
     for directory in _schema_directories():
         path = directory / filename
         if path.is_file():
-            schema = json.loads(path.read_text(encoding="utf-8"))
-            Draft202012Validator.check_schema(schema)
-            return schema
+            return path
     searched = ", ".join(str(path / filename) for path in _schema_directories())
     raise RuntimeError(f"unable to locate {filename}; searched: {searched}")
+
+
+@lru_cache(maxsize=2)
+def load_schema(version: int) -> dict[str, Any]:
+    path = _locate_schema_path(version)
+    schema = json.loads(path.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+    return schema
 
 
 def detect_ir_version(data: Any) -> int:
@@ -229,22 +237,100 @@ def _validate_status(data: dict[str, Any], errors: list[str]) -> None:
     blocking_issues = any(
         issue["blocking"] for issue in data["unresolvedIssues"]
     )
-    incomplete = unresolved_references or blocking_issues
+    unspecified_design = (
+        data["target"]["execution"] == "unspecified"
+        or data["script"]["sideEffects"]["state"] == "unspecified"
+        or data["context"]["mode"] == "unspecified"
+        or any(
+            variable["type"] == "unknown"
+            or variable["initialization"]["method"] == "unspecified"
+            for variable in data["variables"]
+        )
+    )
+    incomplete = unresolved_references or blocking_issues or unspecified_design
     status = data["status"]
     if incomplete and status["design"] == "ready":
         errors.append(
-            "$.status.design: cannot be ready while references or blocking "
-            "issues remain unresolved"
+            "$.status.design: cannot be ready while references, blocking issues, "
+            "or migration-only unspecified values remain unresolved"
         )
     if incomplete and status["evidence"] != "unverified":
         errors.append(
-            "$.status.evidence: must be unverified while references or blocking "
-            "issues remain unresolved"
+            "$.status.evidence: must be unverified while references, blocking "
+            "issues, or migration-only unspecified values remain unresolved"
         )
     if status["evidence"] != "unverified" and status["design"] != "ready":
         errors.append(
             "$.status.design: evidence beyond unverified requires a ready design"
         )
+
+
+def _has_blocking_issue(data: dict[str, Any], category: str) -> bool:
+    return any(
+        issue["category"] == category and issue["blocking"]
+        for issue in data["unresolvedIssues"]
+    )
+
+
+def _validate_migration_only_states(
+    data: dict[str, Any],
+    errors: list[str],
+) -> None:
+    is_migration = data.get("migration") == {"fromSchemaVersion": 1}
+    migration_only_states = [
+        (
+            data["target"]["execution"] == "unspecified",
+            "$.target.execution",
+            "target_execution",
+        ),
+        (
+            data["script"]["sideEffects"]["state"] == "unspecified",
+            "$.script.sideEffects.state",
+            "script_metadata",
+        ),
+        (
+            data["context"]["mode"] == "unspecified",
+            "$.context.mode",
+            "context",
+        ),
+    ]
+
+    for index, variable in enumerate(data["variables"]):
+        migration_only_states.extend(
+            [
+                (
+                    variable["type"] == "unknown",
+                    f"$.variables[{index}].type",
+                    "variable",
+                ),
+                (
+                    variable["initialization"]["method"] == "unspecified",
+                    f"$.variables[{index}].initialization.method",
+                    "variable",
+                ),
+            ]
+        )
+
+    for active, path, issue_category in migration_only_states:
+        if not active:
+            continue
+        if not is_migration:
+            errors.append(
+                f"{path}: value is reserved for deterministic Script IR v1 migration"
+            )
+        elif not _has_blocking_issue(data, issue_category):
+            errors.append(
+                f"$.unresolvedIssues: migration-only value at {path} requires a "
+                f"blocking {issue_category!r} issue"
+            )
+
+    if is_migration:
+        if data["status"]["design"] != "draft":
+            errors.append("$.status.design: migrated v1 documents must remain draft")
+        if data["status"]["evidence"] != "unverified":
+            errors.append(
+                "$.status.evidence: migrated v1 documents must remain unverified"
+            )
 
 
 def _semantic_errors_v2(data: dict[str, Any]) -> list[str]:
@@ -254,24 +340,14 @@ def _semantic_errors_v2(data: dict[str, Any]) -> list[str]:
             "$.script.execution: must match $.target.execution "
             f"({data['target']['execution']!r})"
         )
-    if data["target"]["execution"] == "unspecified":
-        if data.get("migration") != {"fromSchemaVersion": 1}:
-            errors.append(
-                "$.target.execution: unspecified is reserved for deterministic "
-                "migration from Script IR v1"
-            )
-        if not any(
-            issue["category"] == "target_execution"
-            for issue in data["unresolvedIssues"]
-        ):
-            errors.append(
-                "$.unresolvedIssues: migrated unspecified execution requires a "
-                "target_execution issue"
-            )
-    elif "migration" in data:
+    if (
+        "migration" in data
+        and data["target"]["execution"] != "unspecified"
+    ):
         errors.append(
             "$.migration: is allowed only when v1 execution remains unspecified"
         )
+    _validate_migration_only_states(data, errors)
     _validate_embedded_contracts(data, errors)
     _validate_variables(data, errors)
     _validate_object_references(data, errors)
@@ -402,7 +478,7 @@ def migrate_v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
                 "description": (
                     "Script name, purpose, and side effects were not represented in v1."
                 ),
-                "blocking": False,
+                "blocking": True,
             },
             {
                 "key": "migration.inputContract",
@@ -420,7 +496,7 @@ def migrate_v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
                 "key": "migration.context",
                 "category": "context",
                 "description": "The v1 FileMaker context was not represented.",
-                "blocking": False,
+                "blocking": True,
             },
         ],
         "risks": [],
@@ -432,6 +508,17 @@ def migrate_v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
             "fromSchemaVersion": 1,
         },
     }
+    if variables:
+        migrated["unresolvedIssues"].append(
+            {
+                "key": "migration.variables",
+                "category": "variable",
+                "description": (
+                    "Script IR v1 did not declare variable types or purposes."
+                ),
+                "blocking": True,
+            }
+        )
     validate_ir(migrated, version=2)
     return migrated
 
@@ -458,23 +545,18 @@ def ensure_renderable_v2(data: dict[str, Any]) -> None:
                 f"unresolved keys: {unresolved}"
             ]
         )
-    is_v1_migration = (
-        data.get("migration") == {"fromSchemaVersion": 1}
-        and data["target"]["execution"] == "unspecified"
-    )
-    if not is_v1_migration:
-        blocking = [
-            issue["key"]
-            for issue in data["unresolvedIssues"]
-            if issue["blocking"]
-        ]
-        if blocking:
-            raise ScriptIRValidationError(
-                [
-                    "unresolvedIssues: XML generation is blocked by unresolved "
-                    f"items: {blocking}"
-                ]
-            )
+    blocking = [
+        issue["key"]
+        for issue in data["unresolvedIssues"]
+        if issue["blocking"]
+    ]
+    if blocking:
+        raise ScriptIRValidationError(
+            [
+                "unresolvedIssues: XML generation is blocked by unresolved "
+                f"items: {blocking}"
+            ]
+        )
 
 
 def dumps_ir(data: dict[str, Any]) -> str:

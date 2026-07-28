@@ -89,6 +89,7 @@ REQUIRED_PATHS = (
     "sources/registry.json",
     "catalog/fm19.5/verified-steps.json",
     "examples/server-script-ir-v2.json",
+    "scripts/smoke_test_wheel.py",
 )
 
 
@@ -453,15 +454,29 @@ def _validate_script_ir_artifacts(root: Path, errors: list[str]) -> None:
             errors.append("script-ir-v2 schema must use JSON Schema Draft 2020-12")
         if v2.get("properties", {}).get("schemaVersion", {}).get("const") != 2:
             errors.append("script-ir-v2 schema must require schemaVersion 2")
+        evidence_values = (
+            v2.get("$defs", {})
+            .get("status", {})
+            .get("properties", {})
+            .get("evidence", {})
+            .get("enum")
+        )
+        if evidence_values != ["unverified", "design_ready"]:
+            errors.append(
+                "script-ir-v2 input evidence must be limited to "
+                "unverified and design_ready"
+            )
 
     v1_example = _load_json(root / "examples/server-script-ir.json", errors)
     v2_example = _load_json(root / "examples/server-script-ir-v2.json", errors)
     try:
         from fms19_toolkit.script_ir import (
+            ScriptIRValidationError,
             dumps_ir,
             migrate_v1_to_v2,
             validate_ir,
         )
+        from fms19_toolkit.renderer import render_ir
     except ImportError as exc:
         errors.append(f"unable to import Script IR validation: {exc}")
         return
@@ -479,6 +494,48 @@ def _validate_script_ir_artifacts(root: Path, errors: list[str]) -> None:
                 for reference in migrated.get("objectReferences", [])
             ):
                 errors.append("Script IR v1 migration must not fabricate internal IDs")
+            expected_blocking_categories = {
+                "target_execution",
+                "script_metadata",
+                "context",
+            }
+            if migrated.get("variables"):
+                expected_blocking_categories.add("variable")
+            actual_blocking_categories = {
+                issue.get("category")
+                for issue in migrated.get("unresolvedIssues", [])
+                if issue.get("blocking")
+            }
+            if not expected_blocking_categories.issubset(actual_blocking_categories):
+                errors.append(
+                    "Script IR v1 migration must preserve unspecified design "
+                    "facts as corresponding blocking issues"
+                )
+            if migrated.get("status") != {
+                "design": "draft",
+                "evidence": "unverified",
+            }:
+                errors.append(
+                    "Script IR v1 migration must remain draft and unverified"
+                )
+            try:
+                render_ir(v1_example)
+            except (RuntimeError, ValueError) as exc:
+                errors.append(f"direct Script IR v1 render failed: {exc}")
+            try:
+                render_ir(migrated)
+            except ScriptIRValidationError:
+                pass
+            except (RuntimeError, ValueError) as exc:
+                errors.append(
+                    "saved Script IR v1 migration failed with an unexpected "
+                    f"error: {exc}"
+                )
+            else:
+                errors.append(
+                    "saved Script IR v1 migration must not receive the direct-v1 "
+                    "render exception"
+                )
         except (RuntimeError, ValueError) as exc:
             errors.append(f"examples/server-script-ir.json: {exc}")
 

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 
-from fms19_toolkit.renderer import render_ir, render_step
+from fms19_toolkit.renderer import render_ir, render_ir_file, render_step
 from fms19_toolkit.script_ir import (
     ScriptIRValidationError,
     dumps_ir,
@@ -29,6 +29,43 @@ def load_v1() -> dict:
 
 def load_v2() -> dict:
     return json.loads(V2_PATH.read_text(encoding="utf-8"))
+
+
+def handwritten_migration_v2() -> dict:
+    data = load_v2()
+    data["target"]["execution"] = "unspecified"
+    data["script"]["execution"] = "unspecified"
+    data["script"]["sideEffects"] = {"state": "unspecified"}
+    data["context"] = {
+        "mode": "unspecified",
+        "reason": "A synthetic handwritten v2 document omitted context.",
+    }
+    data["unresolvedIssues"] = [
+        {
+            "key": "handwritten.execution",
+            "category": "target_execution",
+            "description": "Execution is intentionally unresolved for this test.",
+            "blocking": True,
+        },
+        {
+            "key": "handwritten.sideEffects",
+            "category": "script_metadata",
+            "description": "Side effects are intentionally unresolved for this test.",
+            "blocking": True,
+        },
+        {
+            "key": "handwritten.context",
+            "category": "context",
+            "description": "Context is intentionally unresolved for this test.",
+            "blocking": True,
+        },
+    ]
+    data["status"] = {
+        "design": "draft",
+        "evidence": "unverified",
+    }
+    data["migration"] = {"fromSchemaVersion": 1}
+    return data
 
 
 class ScriptIRV2Tests(unittest.TestCase):
@@ -79,6 +116,97 @@ class ScriptIRV2Tests(unittest.TestCase):
         data = load_v2()
         data["migration"] = {"fromSchemaVersion": 1}
         self.assert_invalid(data)
+
+    def test_handwritten_migration_marker_does_not_authorize_render(self):
+        data = handwritten_migration_v2()
+        self.assertEqual(validate_ir(data), 2)
+        with self.assertRaises(ScriptIRValidationError):
+            render_ir(data)
+
+    def test_other_serialized_values_cannot_activate_legacy_render(self):
+        base = handwritten_migration_v2()
+        variants = []
+
+        renamed = deepcopy(base)
+        renamed["script"]["name"] = "SRV | Handwritten Synthetic Marker"
+        variants.append(("script name", renamed))
+
+        changed_step = deepcopy(base)
+        changed_step["steps"][0]["text"] = "Synthetic marker test changed."
+        variants.append(("step content", changed_step))
+
+        changed_issues = deepcopy(base)
+        for index, issue in enumerate(changed_issues["unresolvedIssues"]):
+            issue["key"] = f"changed.issue{index}"
+            issue["description"] = f"Synthetic changed issue {index}."
+        variants.append(("issue metadata", changed_issues))
+
+        for label, data in variants:
+            with self.subTest(label=label):
+                self.assertEqual(validate_ir(data), 2)
+                with self.assertRaises(ScriptIRValidationError):
+                    render_ir(data)
+
+    def test_native_v2_unspecified_context_is_rejected(self):
+        data = load_v2()
+        data["context"] = {
+            "mode": "unspecified",
+            "reason": "Synthetic context was not selected.",
+        }
+        self.assert_invalid(data)
+
+    def test_native_v2_unspecified_side_effects_are_rejected(self):
+        data = load_v2()
+        data["script"]["sideEffects"] = {"state": "unspecified"}
+        self.assert_invalid(data)
+
+    def test_native_v2_unspecified_variable_initialization_is_rejected(self):
+        data = load_v2()
+        data["variables"][0]["initialization"] = {"method": "unspecified"}
+        self.assert_invalid(data)
+
+    def test_native_v2_unknown_variable_type_is_rejected(self):
+        data = load_v2()
+        data["variables"][0]["type"] = "unknown"
+        self.assert_invalid(data)
+
+    def test_migration_v2_preserves_unspecified_states_as_draft(self):
+        data = migrate_v1_to_v2(load_v1())
+        data["variables"][0]["initialization"] = {"method": "unspecified"}
+        self.assertEqual(validate_ir(data), 2)
+        self.assertEqual(data["context"]["mode"], "unspecified")
+        self.assertEqual(data["script"]["sideEffects"]["state"], "unspecified")
+        self.assertEqual(data["variables"][0]["type"], "unknown")
+        self.assertEqual(data["status"], {"design": "draft", "evidence": "unverified"})
+
+    def test_migration_only_state_requires_corresponding_blocking_issue(self):
+        data = migrate_v1_to_v2(load_v1())
+        for issue in data["unresolvedIssues"]:
+            if issue["category"] == "context":
+                issue["blocking"] = False
+        self.assert_invalid(data)
+
+    def test_migration_with_unspecified_design_cannot_be_ready(self):
+        for status in (
+            {"design": "ready", "evidence": "unverified"},
+            {"design": "ready", "evidence": "design_ready"},
+        ):
+            with self.subTest(status=status):
+                data = migrate_v1_to_v2(load_v1())
+                data["status"] = status
+                self.assert_invalid(data)
+
+    def test_unsubstantiated_evidence_states_are_rejected(self):
+        for evidence in (
+            "xml_generated",
+            "paste_verified",
+            "runtime_verified",
+            "fmse_verified",
+        ):
+            with self.subTest(evidence=evidence):
+                data = load_v2()
+                data["status"]["evidence"] = evidence
+                self.assert_invalid(data)
 
     def test_step_specific_required_property_is_enforced(self):
         data = load_v2()
@@ -159,6 +287,18 @@ class ScriptIRV2Tests(unittest.TestCase):
             migrate_ir_file(V1_PATH, first_path)
             migrate_ir_file(V1_PATH, second_path)
             self.assertEqual(first_path.read_bytes(), second_path.read_bytes())
+
+    def test_saved_migration_v2_validates_but_cannot_render(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            migrated_path = Path(temp_dir) / "migrated.json"
+            output_path = Path(temp_dir) / "should-not-exist.xml"
+            migrate_ir_file(V1_PATH, migrated_path)
+            migrated = json.loads(migrated_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(validate_ir(migrated), 2)
+            with self.assertRaises(ScriptIRValidationError):
+                render_ir_file(migrated_path, output_path)
+            self.assertFalse(output_path.exists())
 
     def test_v1_render_compatibility(self):
         source = load_v1()

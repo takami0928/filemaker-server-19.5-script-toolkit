@@ -10,6 +10,10 @@
 - 未解決FileMakerオブジェクト参照の内部ID捏造を防止し、XML生成を拒否
 - IRスキーマ、例、移行決定性をリポジトリポリシー検査へ追加
 - Windows／Linux CIでIR検証、移行、v1/v2レンダリングを実行
+- 直接v1入力だけにrender互換例外を限定し、保存済みmigration v2のblocking事項回避を禁止
+- ネイティブv2の`unspecified`／`unknown`を拒否し、移行文書へblocking事項と`draft/unverified`を必須化
+- IR入力の証拠状態を`unverified`／`design_ready`へ限定し、XML生成・実機証拠の自己申告を拒否
+- Windows／Linux CIへinstalled-wheelスキーマ・移行smoke testを追加
 - 標準JSON Schema検証のため`jsonschema>=4.23,<5`を追加
 - ロードマップ、品質ゲート、成熟度、Definition of Doneを追加
 - 出典ポリシーと機械可読な出典レジストリを追加

@@ -4,7 +4,12 @@ from html import escape
 import json
 from pathlib import Path
 
-from .script_ir import ensure_renderable_v2, normalize_ir_to_v2
+from .script_ir import (
+    detect_ir_version,
+    ensure_renderable_v2,
+    migrate_v1_to_v2,
+    validate_ir,
+)
 from .snippet import validate_snippet_text
 
 STEP_IDS = {
@@ -71,11 +76,7 @@ def render_step(step: dict) -> list[str]:
     return lines
 
 
-def render_ir(data: dict) -> str:
-    normalized = normalize_ir_to_v2(data)
-    ensure_renderable_v2(normalized)
-    steps = normalized["steps"]
-
+def _render_validated_steps(steps: list[dict]) -> str:
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<fmxmlsnippet type="FMObjectList">']
     for step in steps:
         lines.extend(render_step(step))
@@ -87,6 +88,21 @@ def render_ir(data: dict) -> str:
     if errors:
         raise ValueError("rendered XML failed validation: " + "; ".join(f.message for f in errors))
     return xml
+
+
+def _render_legacy_v1(data: dict) -> str:
+    migrated = migrate_v1_to_v2(data)
+    return _render_validated_steps(migrated["steps"])
+
+
+def render_ir(data: dict) -> str:
+    source_version = detect_ir_version(data)
+    if source_version == 1:
+        return _render_legacy_v1(data)
+
+    validate_ir(data, version=2)
+    ensure_renderable_v2(data)
+    return _render_validated_steps(data["steps"])
 
 
 def render_ir_file(input_path: str | Path, output_path: str | Path) -> None:

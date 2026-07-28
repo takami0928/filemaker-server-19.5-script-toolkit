@@ -32,8 +32,9 @@ Tracking: #3. Blocked by Phase 0.
 - [x] Strict per-step schemas
 - [x] Unresolved FileMaker object references
 - [x] Migration from the current minimal IR
+- [x] Installed-wheel schema and migration smoke test
 
-Exit condition: met by Issue #3 implementation. Invalid native v2 designs and unresolved object IDs cannot reach XML rendering; v1 compatibility uses a deterministic, explicitly incomplete migration model. Independent PR review and FileMaker hardware verification remain separate gates.
+Exit condition: met by Issue #3 implementation. Invalid native v2 designs, blocking issues, and unresolved object IDs cannot reach XML rendering. Direct v1 compatibility is selected only from the original input version; saved migration v2 documents remain blocked until completed. Independent PR review and FileMaker hardware verification remain separate gates.
 
 ## Phase 2 — Fixture and round-trip pipeline
 

@@ -20,6 +20,11 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 
+[project.optional-dependencies]
+ci = [
+  "build>=1.2,<2",
+]
+
 [project.scripts]
 fms19 = "fms19_toolkit.cli:main"
 
