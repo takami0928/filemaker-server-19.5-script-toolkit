@@ -34,6 +34,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 - Evidence uses only values defined in `docs/EVIDENCE_MODEL.md`.
 - Evidence levels are monotonic and cannot skip required proof.
 - Automated tests cannot claim FileMaker paste, runtime, or FMSE verification.
+- Script IR input cannot self-assert XML generation or FileMaker verification.
 - Documentation distinguishes design-ready, XML-generated, paste-verified, runtime-verified, and FMSE-verified states.
 
 ## G4 — XML and catalog integrity
@@ -51,6 +52,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 
 - Unit tests pass on all supported Python versions.
 - Repository policy validation passes.
+- A built wheel validates and migrates IR outside the repository using installed schema data.
 - Generated output is deterministic.
 - Invalid input fails closed with an actionable error.
 - Clipboard contents are not modified after validation failure.

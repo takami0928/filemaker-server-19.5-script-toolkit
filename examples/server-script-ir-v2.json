@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 2,
+  "target": {
+    "serverVersion": "19.5",
+    "proVersion": "19.5",
+    "execution": "psos",
+    "platform": "windows"
+  },
+  "script": {
+    "name": "SRV | Validate Synthetic Request",
+    "purpose": "Validate a synthetic JSON request and return a deterministic JSON result.",
+    "sideEffects": {
+      "state": "specified",
+      "items": []
+    },
+    "execution": "psos",
+    "inputContract": {
+      "format": "json",
+      "description": "A synthetic request containing a non-empty requestId.",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requestId"
+        ],
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "resultContract": {
+      "format": "json",
+      "description": "A synthetic success or invalid-parameter result.",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "code"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "context": {
+    "mode": "none",
+    "reason": "The script reads only its parameter and does not access FileMaker records or layouts."
+  },
+  "variables": [
+    {
+      "name": "$in",
+      "scope": "local",
+      "type": "json",
+      "initialization": {
+        "method": "script_parameter"
+      },
+      "purpose": "Store the incoming synthetic JSON request."
+    },
+    {
+      "name": "$out",
+      "scope": "local",
+      "type": "json",
+      "initialization": {
+        "method": "calculation",
+        "calculation": "\"{}\""
+      },
+      "purpose": "Store the JSON result returned by Exit Script."
+    }
+  ],
+  "objectReferences": [],
+  "steps": [
+    {
+      "type": "comment",
+      "text": "目的: 合成JSON要求を検証します。\n特殊文字の例: < > & \" '"
+    },
+    {
+      "type": "set_error_capture",
+      "state": true
+    },
+    {
+      "type": "set_variable",
+      "name": "$in",
+      "calculation": "Get ( ScriptParameter )",
+      "repetition": "1"
+    },
+    {
+      "type": "if",
+      "calculation": "IsEmpty ( $in )"
+    },
+    {
+      "type": "set_variable",
+      "name": "$out",
+      "calculation": "JSONSetElement ( \"{}\" ; [ \"ok\" ; 0 ; JSONBoolean ] ; [ \"code\" ; \"INVALID_PARAMETER\" ; JSONString ] )",
+      "repetition": "1"
+    },
+    {
+      "type": "else"
+    },
+    {
+      "type": "set_variable",
+      "name": "$out",
+      "calculation": "JSONSetElement ( \"{}\" ; [ \"ok\" ; 1 ; JSONBoolean ] ; [ \"code\" ; \"OK\" ; JSONString ] )",
+      "repetition": "1"
+    },
+    {
+      "type": "end_if"
+    },
+    {
+      "type": "exit_script",
+      "calculation": "$out"
+    }
+  ],
+  "unresolvedIssues": [],
+  "risks": [],
+  "status": {
+    "design": "ready",
+    "evidence": "design_ready"
+  }
+}

@@ -7,6 +7,14 @@
 - If / Else / End Ifのブロック整合
 - 19.5対象外として明示したステップの拒否
 - JSON IRからXMLへの決定的レンダリング
+- Script IR v1/v2のJSON Schema Draft 2020-12検証
+- v2の変数、コンテキスト、参照キー、制御構造の意味検証
+- v1からv2への決定的移行とFileMaker内部ID非生成
+- 直接v1だけの互換renderと、保存済みmigration v2のrender拒否
+- ネイティブv2における移行専用`unspecified`／`unknown`状態の拒否
+- 未解決オブジェクト参照が残る場合のXML生成拒否
+- IR入力によるXML生成・FileMaker実機証拠の自己申告拒否
+- wheelを空の仮想環境へインストールし、同梱スキーマで行うIR検証・移行
 - Windows用長さプレフィックス付きUTF-8ペイロードのencode/decode往復
 - 出典レジストリの必須項目、ID、URL、日付、重複
 - ステップカタログの出典IDと証拠レベル
@@ -15,6 +23,8 @@
 - 禁止ステップカタログと静的検査コードの一致
 
 これらは`structure_tested`または`clipboard_payload_tested`に相当する自動証拠です。FileMaker Pro／Serverによる実行証拠ではありません。
+
+IR検証、移行、レンダリング、XML lintはWindowsとLinuxのCIで同じコードパスを検査する。Python 3.13の両OS構成ではwheel配布形態も検査する。Win32クリップボードAPIの実機操作はWindows上の手動検証として分離する。
 
 ## 実機検証が必要
 

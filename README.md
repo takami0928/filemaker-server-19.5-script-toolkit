@@ -13,7 +13,8 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 - 19.5を対象とした互換性・禁止事項の管理方法
 - `fmxmlsnippet`の構造検査
 - WindowsのFileMaker専用クリップボード形式への読み書き
-- JSON中間表現から検証済みXMLを生成する保守的なレンダラー
+- 厳格なScript IR v2、v1からの決定的移行、JSON Schema検証
+- JSON中間表現から構造検査済みXMLを生成する保守的なレンダラー
 - AIが実装案を出す際の固定手順と出力契約
 - 出典、証拠レベル、カタログ整合を検査するリポジトリ品質ゲート
 
@@ -29,9 +30,13 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 
 ## 現在の成熟度
 
-現在は **M1 — safe proof of concept** です。
+現在は **M2 — governed design and compilation** です。
 
 - Python単体テスト: 実施済み
+- Script IR v1/v2のDraft 2020-12検証と意味検証: 実施済み
+- v1からv2への決定的移行: 実施済み
+- wheelを空の仮想環境へインストールし、同梱スキーマで検証・移行: 実施済み
+- 未解決FileMakerオブジェクトIDのXML生成拒否: 実施済み
 - XML構造検査: 実施済み
 - Windowsペイロードのencode/decode往復: 実施済み
 - 出典ID、証拠レベル、カタログとコードの整合検査: 実施済み
@@ -64,8 +69,17 @@ python scripts/check_repository.py
 # XML検査
 fms19 lint examples/server-script-steps.xml
 
-# JSON中間表現からXML生成
+# Script IR v2検証
+fms19 validate-ir examples/server-script-ir-v2.json
+
+# v1を、不足情報を明示したdraft/unverifiedのv2へ決定的に移行
+fms19 migrate-ir examples/server-script-ir.json migrated-ir-v2.json
+
+# 元入力がv1の場合だけ、限定された後方互換経路でXML生成
 fms19 render examples/server-script-ir.json generated.xml
+
+# 完成したv2からXML生成
+fms19 render examples/server-script-ir-v2.json generated-v2.xml
 
 # WindowsクリップボードへFileMakerスクリプトステップとして格納
 fms19 clipboard-write generated.xml
@@ -95,6 +109,22 @@ FileMaker Pro 19.5でホストファイルを開き、スクリプトワーク�
 
 それ以外は、FileMaker Pro 19.5から取得した実物XMLフィクスチャとテストを追加してから対応します。AIが未知のXMLを推測して生成することは想定していません。
 
+## Script IR v2
+
+Script IR v2は、FileMaker Server / Pro 19.5、実行モード、スクリプト目的、副作用、JSON入出力契約、コンテキスト、変数、FileMakerオブジェクト参照、未解決事項、リスク、設計・証拠状態を明示します。
+
+フィールド、レイアウト、TO、スクリプト、値一覧の内部IDが不明な場合は、名前と`resolution: "unresolved"`だけを保持します。IDを自動生成せず、未解決参照またはblocking事項が残るv2からはXMLを生成しません。`migration`マーカーもこの検査を回避しません。
+
+既存v1を直接`render`した場合だけ、元入力をv1と判定した内部情報に基づいて従来と同じ7ステップXMLを生成します。`migrate-ir`で保存したv2は検証・編集できますが、不足情報を人間が補完するまでrenderできません。`validate-ir`の成功は、設計文書として整合していることを示し、XML生成可能であることは示しません。
+
+IR入力の証拠状態は`unverified`と`design_ready`だけです。XML生成、FileMaker Pro貼り付け、クライアント実行、FMSE実行はIR自身に申告できず、生成manifestまたは`docs/EVIDENCE_MODEL.md`に従う別の検証記録が必要です。
+
+詳細は[Script IR](docs/SCRIPT_IR.md)、完全な合成例は[server-script-ir-v2.json](examples/server-script-ir-v2.json)、設計判断は[ADR 0002](decisions/0002-script-ir-v2.md)を参照してください。
+
+IR、移行、レンダリング、XML lintはWindowsとLinuxのCIで同じコードパスを実行します。Python 3.13のWindows/Linux構成では、`python -m build`でwheelを作り、空の仮想環境へインストールし、リポジトリ外から同梱スキーマを使う検証・移行も行います。ローカルでは`python -m pip install -e ".[ci]"`後に`python scripts/smoke_test_wheel.py`で同じ検査を実行できます。
+
+Win32クリップボードAPIを使う`clipboard-read`、`clipboard-write`、`clipboard-detect`だけはWindows専用で、実機操作はCIおよびIssue #3の対象外です。
+
 ## 開発計画と品質基準
 
 - [ロードマップ](ROADMAP.md)
@@ -109,6 +139,7 @@ FileMaker Pro 19.5でホストファイルを開き、スクリプトワーク�
 - [目的と責任範囲](docs/PURPOSE.md)
 - [AI利用契約](AI_GUIDE.md)
 - [FileMaker Server 19.5実行境界](docs/FM_SERVER_19_5.md)
+- [Script IR](docs/SCRIPT_IR.md)
 - [スクリプト作法](docs/SCRIPT_STYLE.md)
 - [サーバー実行設計](docs/SERVER_EXECUTION.md)
 - [XML・クリップボード](docs/XML_CLIPBOARD.md)

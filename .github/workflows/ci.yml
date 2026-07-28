@@ -9,18 +9,27 @@ permissions:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [windows-latest, ubuntu-latest]
         python-version: ["3.10", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install -e .
+      - run: python -m pip install -e ".[ci]"
       - run: python scripts/check_repository.py
       - run: python -m unittest discover -s tests -v
+      - run: fms19 validate-ir examples/server-script-ir-v2.json
+      - run: fms19 migrate-ir examples/server-script-ir.json "${{ runner.temp }}/migrated-ir-v2.json"
+      - run: fms19 validate-ir "${{ runner.temp }}/migrated-ir-v2.json"
       - run: fms19 lint examples/server-script-steps.xml
-      - run: fms19 render examples/server-script-ir.json generated.xml
-      - run: fms19 lint generated.xml
+      - run: fms19 render examples/server-script-ir.json "${{ runner.temp }}/generated-v1.xml"
+      - run: fms19 render examples/server-script-ir-v2.json "${{ runner.temp }}/generated-v2.xml"
+      - run: fms19 lint "${{ runner.temp }}/generated-v1.xml"
+      - run: fms19 lint "${{ runner.temp }}/generated-v2.xml"
+      - name: Smoke-test installed wheel outside the repository
+        if: matrix.python-version == '3.13'
+        run: python scripts/smoke_test_wheel.py

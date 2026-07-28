@@ -1,0 +1,1058 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/fms19/script-ir-v2.schema.json",
+  "title": "FileMaker Server 19.5 Script IR v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "target",
+    "script",
+    "context",
+    "variables",
+    "objectReferences",
+    "steps",
+    "unresolvedIssues",
+    "risks",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "target": {
+      "$ref": "#/$defs/target"
+    },
+    "script": {
+      "$ref": "#/$defs/script"
+    },
+    "context": {
+      "$ref": "#/$defs/context"
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variable"
+      }
+    },
+    "objectReferences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/objectReference"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "unresolvedIssues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/unresolvedIssue"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/risk"
+      }
+    },
+    "status": {
+      "$ref": "#/$defs/status"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "target"
+        ],
+        "properties": {
+          "target": {
+            "required": [
+              "execution"
+            ],
+            "properties": {
+              "execution": {
+                "const": "unspecified"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "script": {
+            "required": [
+              "execution"
+            ],
+            "properties": {
+              "execution": {
+                "const": "unspecified"
+              }
+            }
+          },
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "target_execution"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "migration"
+        ]
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "required": [
+              "execution"
+            ],
+            "properties": {
+              "execution": {
+                "const": "unspecified"
+              }
+            }
+          },
+          "script": {
+            "required": [
+              "execution"
+            ],
+            "properties": {
+              "execution": {
+                "const": "unspecified"
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "context"
+        ],
+        "properties": {
+          "context": {
+            "required": [
+              "mode"
+            ],
+            "properties": {
+              "mode": {
+                "const": "unspecified"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "context"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "script"
+        ],
+        "properties": {
+          "script": {
+            "required": [
+              "sideEffects"
+            ],
+            "properties": {
+              "sideEffects": {
+                "required": [
+                  "state"
+                ],
+                "properties": {
+                  "state": {
+                    "const": "unspecified"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "script_metadata"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "variables"
+        ],
+        "properties": {
+          "variables": {
+            "contains": {
+              "anyOf": [
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "type": {
+                      "const": "unknown"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "initialization"
+                  ],
+                  "properties": {
+                    "initialization": {
+                      "required": [
+                        "method"
+                      ],
+                      "properties": {
+                        "method": {
+                          "const": "unspecified"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "migration"
+        ],
+        "properties": {
+          "unresolvedIssues": {
+            "contains": {
+              "required": [
+                "category",
+                "blocking"
+              ],
+              "properties": {
+                "category": {
+                  "const": "variable"
+                },
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          },
+          "status": {
+            "required": [
+              "design",
+              "evidence"
+            ],
+            "properties": {
+              "design": {
+                "const": "draft"
+              },
+              "evidence": {
+                "const": "unverified"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "execution": {
+      "enum": [
+        "client",
+        "psos",
+        "server_schedule",
+        "unspecified"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "serverVersion",
+        "proVersion",
+        "execution",
+        "platform"
+      ],
+      "properties": {
+        "serverVersion": {
+          "const": "19.5"
+        },
+        "proVersion": {
+          "const": "19.5"
+        },
+        "execution": {
+          "$ref": "#/$defs/execution"
+        },
+        "platform": {
+          "const": "windows"
+        }
+      }
+    },
+    "jsonContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "description",
+        "schema"
+      ],
+      "properties": {
+        "format": {
+          "const": "json"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "type": [
+            "object",
+            "boolean"
+          ]
+        }
+      }
+    },
+    "sideEffects": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "items"
+          ],
+          "properties": {
+            "state": {
+              "const": "specified"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "const": "unspecified"
+            }
+          }
+        }
+      ]
+    },
+    "script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "purpose",
+        "sideEffects",
+        "execution",
+        "inputContract",
+        "resultContract"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sideEffects": {
+          "$ref": "#/$defs/sideEffects"
+        },
+        "execution": {
+          "$ref": "#/$defs/execution"
+        },
+        "inputContract": {
+          "$ref": "#/$defs/jsonContract"
+        },
+        "resultContract": {
+          "$ref": "#/$defs/jsonContract"
+        }
+      }
+    },
+    "recordIdentification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "description"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "none",
+            "script_parameter",
+            "current_record",
+            "current_found_set",
+            "find_criteria",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "foundSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "handling",
+        "description"
+      ],
+      "properties": {
+        "handling": {
+          "enum": [
+            "not_applicable",
+            "rebuild",
+            "replace",
+            "preserve",
+            "constrain",
+            "extend",
+            "use_current"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "context": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "reason"
+          ],
+          "properties": {
+            "mode": {
+              "const": "none"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "reason"
+          ],
+          "properties": {
+            "mode": {
+              "const": "unspecified"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "layoutRef",
+            "tableOccurrenceRef",
+            "recordIdentification",
+            "foundSet"
+          ],
+          "properties": {
+            "mode": {
+              "const": "required"
+            },
+            "layoutRef": {
+              "$ref": "#/$defs/referenceKey"
+            },
+            "tableOccurrenceRef": {
+              "$ref": "#/$defs/referenceKey"
+            },
+            "recordIdentification": {
+              "$ref": "#/$defs/recordIdentification"
+            },
+            "foundSet": {
+              "$ref": "#/$defs/foundSet"
+            }
+          }
+        }
+      ]
+    },
+    "variableName": {
+      "type": "string",
+      "pattern": "^\\$\\$?[^$].*$"
+    },
+    "variableInitialization": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "calculation"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "calculation",
+                "first_assignment"
+              ]
+            },
+            "calculation": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "value"
+          ],
+          "properties": {
+            "method": {
+              "const": "literal"
+            },
+            "value": true
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "script_parameter",
+                "none",
+                "unspecified"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "variable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "scope",
+        "type",
+        "initialization",
+        "purpose"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/variableName"
+        },
+        "scope": {
+          "enum": [
+            "local",
+            "global"
+          ]
+        },
+        "type": {
+          "enum": [
+            "text",
+            "number",
+            "boolean",
+            "date",
+            "time",
+            "timestamp",
+            "container",
+            "json",
+            "unknown"
+          ]
+        },
+        "initialization": {
+          "$ref": "#/$defs/variableInitialization"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "referenceKey": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+    },
+    "objectType": {
+      "enum": [
+        "field",
+        "layout",
+        "tableOccurrence",
+        "script",
+        "valueList"
+      ]
+    },
+    "objectReference": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "key",
+            "type",
+            "name",
+            "internalId",
+            "resolution"
+          ],
+          "properties": {
+            "key": {
+              "$ref": "#/$defs/referenceKey"
+            },
+            "type": {
+              "$ref": "#/$defs/objectType"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "internalId": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "resolution": {
+              "const": "resolved"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "key",
+            "type",
+            "name",
+            "resolution"
+          ],
+          "properties": {
+            "key": {
+              "$ref": "#/$defs/referenceKey"
+            },
+            "type": {
+              "$ref": "#/$defs/objectType"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resolution": {
+              "const": "unresolved"
+            }
+          }
+        }
+      ]
+    },
+    "stepEnabled": {
+      "type": "boolean"
+    },
+    "commentStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "comment"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "setErrorCaptureStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "state"
+      ],
+      "properties": {
+        "type": {
+          "const": "set_error_capture"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        },
+        "state": {
+          "type": "boolean"
+        }
+      }
+    },
+    "setVariableStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "name",
+        "calculation",
+        "repetition"
+      ],
+      "properties": {
+        "type": {
+          "const": "set_variable"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        },
+        "name": {
+          "$ref": "#/$defs/variableName"
+        },
+        "calculation": {
+          "type": "string"
+        },
+        "repetition": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ifStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "calculation"
+      ],
+      "properties": {
+        "type": {
+          "const": "if"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        },
+        "calculation": {
+          "type": "string"
+        }
+      }
+    },
+    "elseStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "else"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        }
+      }
+    },
+    "endIfStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "end_if"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        }
+      }
+    },
+    "exitScriptStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "calculation"
+      ],
+      "properties": {
+        "type": {
+          "const": "exit_script"
+        },
+        "enabled": {
+          "$ref": "#/$defs/stepEnabled"
+        },
+        "calculation": {
+          "type": "string"
+        }
+      }
+    },
+    "step": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/commentStep"
+        },
+        {
+          "$ref": "#/$defs/setErrorCaptureStep"
+        },
+        {
+          "$ref": "#/$defs/setVariableStep"
+        },
+        {
+          "$ref": "#/$defs/ifStep"
+        },
+        {
+          "$ref": "#/$defs/elseStep"
+        },
+        {
+          "$ref": "#/$defs/endIfStep"
+        },
+        {
+          "$ref": "#/$defs/exitScriptStep"
+        }
+      ]
+    },
+    "unresolvedIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "category",
+        "description",
+        "blocking"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/referenceKey"
+        },
+        "category": {
+          "enum": [
+            "target_execution",
+            "script_metadata",
+            "input_contract",
+            "result_contract",
+            "context",
+            "variable",
+            "object_reference",
+            "business_rule",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocking": {
+          "type": "boolean"
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "severity",
+        "description",
+        "mitigation"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/referenceKey"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mitigation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "design",
+        "evidence"
+      ],
+      "properties": {
+        "design": {
+          "enum": [
+            "draft",
+            "ready",
+            "blocked"
+          ]
+        },
+        "evidence": {
+          "enum": [
+            "unverified",
+            "design_ready"
+          ]
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromSchemaVersion"
+      ],
+      "properties": {
+        "fromSchemaVersion": {
+          "const": 1
+        }
+      }
+    }
+  }
+}

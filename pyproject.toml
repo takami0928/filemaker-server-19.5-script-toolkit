@@ -10,6 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
 authors = [{name = "kouhei takami"}]
+dependencies = [
+  "jsonschema>=4.23,<5",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: Apache Software License",
@@ -17,8 +20,20 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 
+[project.optional-dependencies]
+ci = [
+  "build>=1.2,<2",
+]
+
 [project.scripts]
 fms19 = "fms19_toolkit.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.data-files]
+"share/fms19-script-toolkit/schemas" = [
+  "schemas/script-ir-v1.schema.json",
+  "schemas/script-ir-v2.schema.json",
+  "schemas/script-ir.schema.json",
+]
