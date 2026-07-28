@@ -13,13 +13,15 @@
         "agentic-fm-public-implementation"
       ],
       "evidence": [
+        "documented",
         "public_fixture_observed",
         "structure_tested",
         "clipboard_payload_tested"
       ],
       "missingEvidence": [
         "fm19_5_paste_verified",
-        "fm19_5_runtime_verified"
+        "fm19_5_runtime_verified",
+        "fmse_verified"
       ]
     },
     {
