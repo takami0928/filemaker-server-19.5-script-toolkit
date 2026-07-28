@@ -1,0 +1,56 @@
+name: Bootstrap repository
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".bootstrap/**"
+      - ".github/workflows/bootstrap.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  populate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct and verify source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find .bootstrap -maxdepth 1 -type f -name 'part-*' | wc -l)" -eq 8
+          cat .bootstrap/part-* > /tmp/toolkit.b64
+          base64 --decode /tmp/toolkit.b64 > /tmp/toolkit.zip
+          echo "15c380dcf3a7b4d6145eaec9375756ba955e5caa06575b61dc4c6454ababe0d1  /tmp/toolkit.zip" | sha256sum --check --strict
+
+      - name: Populate repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -q -o /tmp/toolkit.zip -d .
+          rm -rf .bootstrap
+          rm -f .github/workflows/bootstrap.yml
+
+      - name: Validate toolkit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e .
+          python -m unittest discover -s tests -v
+          fms19 lint examples/server-script-steps.xml
+          fms19 render examples/server-script-ir.json /tmp/generated.xml
+          fms19 lint /tmp/generated.xml
+
+      - name: Commit populated repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Populate FileMaker Server 19.5 script toolkit"
+          git push
