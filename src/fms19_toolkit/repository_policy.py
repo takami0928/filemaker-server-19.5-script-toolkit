@@ -22,10 +22,50 @@ RUNTIME_EVIDENCE = {
     "fm19_5_runtime_verified",
     "fmse_verified",
 }
+EVIDENCE_PREREQUISITES = {
+    "structure_tested": {"public_fixture_observed"},
+    "clipboard_payload_tested": {"structure_tested"},
+    "fm19_5_paste_verified": {"clipboard_payload_tested"},
+    "fm19_5_runtime_verified": {"fm19_5_paste_verified"},
+    "fmse_verified": {"fm19_5_runtime_verified"},
+}
+VERIFICATION_REQUIRED_FIELDS = {
+    "fm19_5_paste_verified": {
+        "fileMakerProVersion",
+        "windowsVersion",
+        "fixtureSha256",
+        "testedAt",
+        "tester",
+    },
+    "fm19_5_runtime_verified": {
+        "fileMakerProVersion",
+        "windowsVersion",
+        "fixtureSha256",
+        "testedAt",
+        "tester",
+        "testCase",
+        "expected",
+        "actual",
+    },
+    "fmse_verified": {
+        "fileMakerProVersion",
+        "windowsVersion",
+        "fixtureSha256",
+        "testedAt",
+        "tester",
+        "testCase",
+        "expected",
+        "actual",
+        "fileMakerServerVersion",
+        "serverOs",
+        "executionMode",
+    },
+}
 SOURCE_TYPES = {"primary", "secondary"}
 SOURCE_STATUSES = {"active", "archived", "superseded", "unavailable"}
 STEP_STATUSES = {"experimental", "supported", "deprecated"}
 SOURCE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 REQUIRED_PATHS = (
     "ROADMAP.md",
@@ -36,6 +76,7 @@ REQUIRED_PATHS = (
     "docs/SOURCE_POLICY.md",
     "decisions/README.md",
     "decisions/0000-template.md",
+    "decisions/0001-govern-source-evidence-and-generation.md",
     "schemas/source-registry.schema.json",
     "sources/registry.json",
     "catalog/fm19.5/verified-steps.json",
@@ -73,7 +114,80 @@ def _validate_evidence(
     unknown = evidence - EVIDENCE_SET
     if unknown:
         errors.append(f"{label}: unknown evidence values: {sorted(unknown)}")
+    expected_order = [level for level in EVIDENCE_LEVELS if level in evidence]
+    if values != expected_order:
+        errors.append(f"{label}: evidence values must follow canonical order")
     return evidence
+
+
+def _validate_evidence_progression(
+    evidence: set[str],
+    label: str,
+    errors: list[str],
+) -> None:
+    for level, prerequisites in EVIDENCE_PREREQUISITES.items():
+        if level in evidence and not prerequisites.issubset(evidence):
+            errors.append(
+                f"{label}: {level} requires evidence {sorted(prerequisites)}"
+            )
+
+
+def _validate_verification(
+    verification: Any,
+    evidence: set[str],
+    label: str,
+    errors: list[str],
+) -> None:
+    runtime_levels = evidence & RUNTIME_EVIDENCE
+    if not runtime_levels:
+        if verification not in (None, {}):
+            errors.append(f"{label}: verification metadata exists without runtime evidence")
+        return
+    if not isinstance(verification, dict):
+        errors.append(f"{label}: runtime evidence requires verification object")
+        return
+    unknown_levels = set(verification) - RUNTIME_EVIDENCE
+    if unknown_levels:
+        errors.append(f"{label}: unknown verification levels: {sorted(unknown_levels)}")
+    missing_levels = runtime_levels - set(verification)
+    if missing_levels:
+        errors.append(f"{label}: missing verification records for {sorted(missing_levels)}")
+    for level in sorted(runtime_levels):
+        records = verification.get(level)
+        record_label = f"{label}.verification.{level}"
+        if not isinstance(records, list) or not records:
+            errors.append(f"{record_label}: must be a non-empty array")
+            continue
+        required = VERIFICATION_REQUIRED_FIELDS[level]
+        for index, record in enumerate(records):
+            item_label = f"{record_label}[{index}]"
+            if not isinstance(record, dict):
+                errors.append(f"{item_label}: record must be an object")
+                continue
+            missing = required - record.keys()
+            if missing:
+                errors.append(f"{item_label}: missing fields: {sorted(missing)}")
+            for field in required:
+                if field in record and (
+                    not isinstance(record[field], str) or not record[field].strip()
+                ):
+                    errors.append(f"{item_label}: {field} must be a non-empty string")
+            if "testedAt" in record:
+                try:
+                    date.fromisoformat(str(record["testedAt"]))
+                except ValueError:
+                    errors.append(f"{item_label}: testedAt must be YYYY-MM-DD")
+            if "fixtureSha256" in record and not SHA256_RE.fullmatch(
+                str(record["fixtureSha256"])
+            ):
+                errors.append(f"{item_label}: fixtureSha256 must be lowercase SHA-256")
+            if level == "fmse_verified" and record.get("executionMode") not in {
+                "psos",
+                "server_schedule",
+            }:
+                errors.append(
+                    f"{item_label}: executionMode must be psos or server_schedule"
+                )
 
 
 def _validate_source_registry(root: Path, errors: list[str]) -> set[str]:
@@ -81,6 +195,8 @@ def _validate_source_registry(root: Path, errors: list[str]) -> set[str]:
     data = _load_json(path, errors)
     if not isinstance(data, dict):
         return set()
+    if set(data) != {"schemaVersion", "sources"}:
+        errors.append("sources/registry.json: root fields must be schemaVersion and sources")
     if data.get("schemaVersion") != 1:
         errors.append("sources/registry.json: schemaVersion must be 1")
     sources = data.get("sources")
@@ -133,6 +249,8 @@ def _validate_source_registry(root: Path, errors: list[str]) -> set[str]:
         for field in ("title", "publisher", "targetVersion", "scope"):
             if not isinstance(source.get(field), str) or not source[field].strip():
                 errors.append(f"{label}: {field} must be a non-empty string")
+        if "notes" in source and not isinstance(source["notes"], str):
+            errors.append(f"{label}: notes must be a string")
     return seen
 
 
@@ -160,6 +278,8 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
     data = _load_json(path, errors)
     if not isinstance(data, dict):
         return
+    if set(data) != {"schemaVersion", "target", "policy", "steps", "forbidden"}:
+        errors.append("step catalog: unexpected or missing root fields")
     if data.get("schemaVersion") != 1:
         errors.append("step catalog: schemaVersion must be 1")
     if data.get("policy") != "deny-by-default":
@@ -188,10 +308,14 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
             "evidence",
             "missingEvidence",
         }
+        allowed = required | {"verification"}
         missing = required - step.keys()
+        extra = step.keys() - allowed
         if missing:
             errors.append(f"{label}: missing fields: {sorted(missing)}")
             continue
+        if extra:
+            errors.append(f"{label}: unknown fields: {sorted(extra)}")
         ir = step.get("ir")
         name = step.get("name")
         step_id = step.get("id")
@@ -213,8 +337,9 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
             errors.append(f"{label}: duplicate step id: {step_id}")
         else:
             seen_ids.add(step_id)
-        if step.get("status") not in STEP_STATUSES:
-            errors.append(f"{label}: invalid status: {step.get('status')!r}")
+        status = step.get("status")
+        if status not in STEP_STATUSES:
+            errors.append(f"{label}: invalid status: {status!r}")
         _validate_source_ids(step.get("sourceIds"), known_sources, label, errors)
         evidence = _validate_evidence(step.get("evidence"), label, errors)
         missing_evidence = _validate_evidence(
@@ -226,8 +351,13 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
         overlap = evidence & missing_evidence
         if overlap:
             errors.append(f"{label}: evidence and missingEvidence overlap: {sorted(overlap)}")
-        if evidence & RUNTIME_EVIDENCE and not step.get("verification"):
-            errors.append(f"{label}: runtime evidence requires verification metadata")
+        uncovered = EVIDENCE_SET - evidence - missing_evidence
+        if uncovered:
+            errors.append(f"{label}: evidence state does not classify {sorted(uncovered)}")
+        _validate_evidence_progression(evidence, label, errors)
+        _validate_verification(step.get("verification"), evidence, label, errors)
+        if status == "supported" and "fm19_5_paste_verified" not in evidence:
+            errors.append(f"{label}: supported status requires fm19_5_paste_verified")
         if isinstance(ir, str) and isinstance(step_id, int) and isinstance(name, str):
             catalog_steps[ir] = (step_id, name)
 
@@ -244,9 +374,12 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
                 continue
             required = {"name", "introducedIn", "reason", "sourceIds", "evidence"}
             missing = required - item.keys()
+            extra = item.keys() - required
             if missing:
                 errors.append(f"{label}: missing fields: {sorted(missing)}")
                 continue
+            if extra:
+                errors.append(f"{label}: unknown fields: {sorted(extra)}")
             name = item.get("name")
             if not isinstance(name, str) or not name:
                 errors.append(f"{label}: name must be a non-empty string")
@@ -254,8 +387,13 @@ def _validate_step_catalog(root: Path, known_sources: set[str], errors: list[str
                 errors.append(f"{label}: duplicate forbidden name: {name}")
             else:
                 forbidden_names.add(name)
+            for field in ("introducedIn", "reason"):
+                if not isinstance(item.get(field), str) or not item[field].strip():
+                    errors.append(f"{label}: {field} must be a non-empty string")
             _validate_source_ids(item.get("sourceIds"), known_sources, label, errors)
-            _validate_evidence(item.get("evidence"), label, errors)
+            forbidden_evidence = _validate_evidence(item.get("evidence"), label, errors)
+            if "documented" not in forbidden_evidence:
+                errors.append(f"{label}: forbidden compatibility claim requires documented evidence")
 
     try:
         from fms19_toolkit.renderer import STEP_IDS
@@ -282,6 +420,7 @@ def check_repository(root: str | Path) -> list[str]:
     for relative in REQUIRED_PATHS:
         if not (root_path / relative).is_file():
             errors.append(f"missing required path: {relative}")
+    _load_json(root_path / "schemas/source-registry.schema.json", errors)
     known_sources = _validate_source_registry(root_path, errors)
     _validate_step_catalog(root_path, known_sources, errors)
     return errors
