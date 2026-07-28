@@ -1,23 +1,42 @@
 # 参照資料
 
-## Claris公式
+互換性・動作上の主張に使用する正規の出典一覧は、[`sources/registry.json`](../sources/registry.json)で管理する。
 
-- FileMaker ServerおよびFileMaker Cloudでのスクリプト実行
-  https://help.claris.com/en/pro-help/content/running-scripts-on-server.html
-- FileMaker Pro 19 スクリプトステップリファレンス
-  https://help.claris.com/archive/fm19/en/pro-help/content/script-steps-reference.html
-- Perform Script on Server
-  https://help.claris.com/en/pro-help/content/perform-script-on-server.html
-- FileMaker Server 19のFileMakerスクリプト実行
-  https://help.claris.com/archive/fm19/en/server-help/content/schedule-run-fm-script.html
-- スクリプトのコピーと貼り付け
-  https://help.claris.com/en/pro-help/content/copying-pasting-scripts.html
-- Save a Copy as XML
-  https://help.claris.com/archive/fm19/en/pro-help/content/save-a-copy-as-xml.html
+この文書は人間向けの案内であり、カタログやコードから参照する場合はURLではなく`sourceId`を使用する。
 
-## 公開実装
+## 主要な一次資料
 
-- petrowsky/agentic-fm
-  https://github.com/petrowsky/agentic-fm
+- `claris-fm19-running-scripts-on-server`
+  - FileMaker Server／CloudでのFMSE実行、コンテキスト、非対応ステップ
+- `claris-fm19-script-steps-reference`
+  - FileMaker Pro 19のスクリプトステップ
+- `claris-fm19-server-script-schedule`
+  - FileMaker Server 19のスクリプトスケジュール
+- `claris-copy-paste-scripts`
+  - FileMaker Proのスクリプトコピー・貼り付け
+- `claris-fm19-save-copy-as-xml`
+  - FileMaker Pro 19のSave a Copy as XML
+- `microsoft-win32-clipboard`
+  - Windowsカスタムクリップボード形式とメモリ管理
 
-公開実装は動作原理と相互運用性の参考として扱い、FileMaker Server 19.5での実機確認を省略する根拠にはしない。
+## 19.5対象外機能の一次資料
+
+- `claris-open-transaction`
+- `claris-commit-transaction`
+- `claris-revert-transaction`
+- `claris-psos-callback`
+
+これらは各ページの`Originated in version`を根拠として、FileMaker 19.5対象では禁止する。
+
+## 二次資料・公開実装
+
+- `agentic-fm-public-implementation`
+
+公開実装は、`fmxmlsnippet`やWindowsクリップボードの構造を観察するための二次資料として扱う。FileMaker Pro 19.5での貼り付けやFileMaker Server 19.5での実行を証明するものではない。
+
+## 運用ルール
+
+- 新しい主張を追加する場合は、先に`sources/registry.json`へ出典を登録する。
+- FileMaker 19.5固有の判断では、Clarisの19アーカイブを優先する。
+- 現行版ヘルプを使う場合は、19.5へ適用できる根拠を別途確認する。
+- 調査メモやDeep Research結果を、そのまま正規仕様として扱わない。
