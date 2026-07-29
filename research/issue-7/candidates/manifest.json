@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "issue": 7,
+  "generatedAt": "2026-07-29",
+  "target": "FileMaker Server 19.5 / FileMaker Pro 19.5",
+  "classification": "research-candidate",
+  "validation": {
+    "sources": 110,
+    "steps": 59,
+    "requestedHighPrioritySteps": "51/51",
+    "additionalAuditedSteps": 8,
+    "functions": 24,
+    "errors": 117,
+    "exclusionsAndTransitions": 15,
+    "unresolvedQuestions": 20,
+    "coverageDomains": 18,
+    "duplicateSourceIds": 0,
+    "duplicateStepNames": 0,
+    "unknownSourceReferences": 0,
+    "numericFmxmlsnippetIdsAsserted": 0
+  },
+  "files": [
+    {
+      "path": "deep-research-report.md",
+      "bytes": 62259,
+      "sha256": "8e707c2f73554f25913bb0c1c28d481f41d16cb5502d87039e2383a1cf93b4c5"
+    },
+    {
+      "path": "coverage-audit.json",
+      "bytes": 5708,
+      "sha256": "2b3ed862920a2ae78137a7ba7b9687c3ef2eed4c9700fc4f35d1b3904035ba16"
+    },
+    {
+      "path": "revision-notes.md",
+      "bytes": 1004,
+      "sha256": "b0bdc4647168767a46b10727a9b3819b810181565d89003611d955b94336c2fe"
+    },
+    {
+      "path": "script-step-catalog-candidates.json",
+      "bytes": 154187,
+      "sha256": "4c65d18e7ab7b7b7943da2e22e519218e91317c729ecd6b5f673b31a02c1702e"
+    },
+    {
+      "path": "source-registry-candidates.json",
+      "bytes": 53455,
+      "sha256": "a658100b1fa1a020110ccfe7a7181676092631ebddaa0ee3e8b6495e760bb3e9"
+    },
+    {
+      "path": "unresolved-questions.json",
+      "bytes": 13574,
+      "sha256": "4cf49ad59275c1074cfa6a62e096fbabfd7932af13d6e42397dbbeaf8419ae2c"
+    }
+  ],
+  "storageFormat": {
+    "json": "UTF-8 minified JSON with trailing newline",
+    "markdown": "UTF-8 Markdown"
+  }
+}
