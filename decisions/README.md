@@ -34,3 +34,4 @@ An ADR records why a choice was made. It does not replace implementation documen
 - [ADR 0001](0001-govern-source-evidence-and-generation.md): govern sources, evidence, and generation
 - [ADR 0002](0002-script-ir-v2.md): adopt strict Script IR v2
 - [ADR 0003](0003-normalize-compatibility-catalog-and-cli.md): normalize the 19.5 compatibility catalog for reference CLI use
+- [ADR 0004](0004-adopt-copilot-first-knowledge-package.md): adopt a Copilot-first public knowledge package

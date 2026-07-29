@@ -1,5 +1,11 @@
 # 検証状態
 
+## 対象の分離
+
+以下の自動検証状態は、既存の互換性データ、パターン、Script IR、XML、clipboard、配布wheelに関するものです。Copilot knowledge packageの完成度や、Copilotが生成する人間向け設計書の正しさを示しません。
+
+`docs/copilot/`、SharePoint配布パッケージ、SharePoint統合運用、M365 Copilot受入試験はまだ存在または実施していません。
+
 ## 自動検証済み
 
 - Python 3.10／3.13での構文・単体テスト

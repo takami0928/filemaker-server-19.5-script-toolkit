@@ -1,128 +1,97 @@
 # Roadmap
 
-This roadmap orders work by dependency and safety. Expanding XML coverage before the evidence, schema, and analyzer layers exist is intentionally avoided.
+This roadmap orders work by Copilot value delivery. The primary outcome is a human-readable FileMaker Server 19.5 script design document, not generated XML.
 
 ## Current state
 
-- Maturity: **M2 — governed design and compilation**
-- Target: FileMaker Server 19.5 with FileMaker Pro 19.5 development on Windows
-- Policy: deny by default
-- Runtime evidence: not yet collected from FileMaker Pro or FileMaker Server 19.5
+- Target: FileMaker Server 19.5 with manual implementation in FileMaker Pro 19.5 Script Workspace
+- Public source of truth: this GitHub repository
+- Internal source of truth: a separate SharePoint library or clearly segregated area
+- Policy: deny by default and do not infer missing FileMaker objects, privileges, business rules, or internal IDs
+- FileMaker Pro/Server 19.5 evidence: not yet collected
+- Copilot knowledge package and SharePoint distribution package: not yet created
 
-## Phase 0 — Governance foundation
+## Foundation — completed
 
-Tracking: #2
+The following completed work remains the foundation for the Copilot-first path.
 
-- Quality gates and Definition of Done
-- Evidence levels and promotion rules
-- Source registry and source policy
-- Architecture Decision Records
-- Agent/Codex contribution rules
-- CI checks for repository policy
+- Issue #2: governance, quality gates, source policy, evidence boundaries, ADRs, and repository policy checks
+- Deny-by-default handling for unknown compatibility and unresolved FileMaker object references
+- `research-candidate` separation from normalized reference data and FileMaker evidence
+- Issue #7 Phase A: all 59 researched script steps normalized into the FileMaker 19.5 compatibility catalog
+- Issue #7 Phase A: deterministic `compat` and `list-steps` reference CLI
+- Issue #7 Phase B: exactly five design-only practical patterns for JSON validation, primary-key find, create, update, and synchronous PSOS
+- A shared JSON result contract across the five patterns
+- Required placeholders that fail closed instead of being inferred
 
-Exit condition: repository claims, evidence, and generated assets are governed by machine-checkable rules.
+Issue #3 also completed strict Script IR v2, deterministic v1 migration, installed-wheel checks, and conservative XML renderability rules. Those results remain as historical, maintained assets, but their expansion is now a deferred experimental track rather than a prerequisite for Copilot work.
 
-## Phase 1 — Strict Script IR v2
+## Next — Copilot knowledge package
 
-Tracking: #3. Blocked by Phase 0.
+Tracking: #8. This is the next central implementation step.
 
-- [x] Versioned target and execution mode
-- [x] Script input/output contracts
-- [x] Declared variables and context
-- [x] Strict per-step schemas
-- [x] Unresolved FileMaker object references
-- [x] Migration from the current minimal IR
-- [x] Installed-wheel schema and migration smoke test
+The next PR will create `docs/copilot/` as a small set of Markdown documents. That directory does not exist yet.
 
-Exit condition: met by Issue #3 implementation. Invalid native v2 designs, blocking issues, and unresolved object IDs cannot reach XML rendering. Direct v1 compatibility is selected only from the original input version; saved migration v2 documents remain blocked until completed. Independent PR review and FileMaker hardware verification remain separate gates.
+- Keep one document focused on one purpose.
+- Explain execution-context selection across client, PSOS, server schedule, WebDirect, and other relevant contexts.
+- Cover error handling, record locks, Commit, Revert, retries, idempotency, and security.
+- State which internal system information Copilot must retrieve.
+- Define the difference between a draft design and an implementation-ready design.
+- Define stop conditions and prohibit inferred object names, IDs, privileges, and business rules.
+- Define the complete human-readable design-document output.
+- Define human review and FileMaker test procedures.
+- Include a complete synthetic example.
 
-## Phase 2 — Fixture and round-trip pipeline
+Issue #7 continues only for unresolved FileMaker 19.5 knowledge that the Copilot package actually needs. Broad catalog completion, XML fixture capture, and unrelated research are not prerequisites for Issue #8.
 
-Tracking: #4. Blocked by Phases 0–1.
+Exit condition: the public Markdown gives Copilot enough bounded guidance to produce a reviewable design without claiming that `docs/copilot/`, SharePoint integration, or FileMaker runtime evidence already exists.
 
-- Fixture manifests and hashes
-- Import, normalize, inspect, semantic diff, parse, and round-trip commands
-- XML-to-IR parser
-- Golden fixtures and tests
+## Following — SharePoint package and pilot
 
-Exit condition: FileMaker-copied XML can be captured once and processed deterministically.
+After the knowledge documents are reviewed:
 
-## Phase 3 — Static analyzer
+- Build a distribution package containing only `docs/copilot/`.
+- Add package version information and exact scope.
+- Document manual placement into SharePoint.
+- Keep the public package separate from internal objects, workflows, privileges, naming rules, specifications, and requirements.
+- Define representative acceptance tests.
+- Define instructions for the Copilot agent.
 
-Tracking: #5. Blocked by Phases 0–2.
+Automatic GitHub-to-SharePoint synchronization is not an initial requirement. The first pilot may use a documented manual update process.
 
-- P0–P3 rule engine
-- Variable, error, context, found-set, destructive-operation, and server-compatibility rules
-- Machine-readable and human-readable reports
+## Deferred experimental tracks
 
-Exit condition: unsafe design patterns are detected before clipboard output.
+The following work is frozen or optional until explicitly reapproved. None is a prerequisite for the Copilot knowledge package or the initial SharePoint pilot.
 
-## Phase 4 — AI evaluation suite
+- Issue #4: fixture capture and semantic round-trip pipeline
+- Issue #5: large static analyzer
+- Issue #6: large AI evaluation suite
+- XML renderer expansion
+- clipboard expansion
+- Script IR v2 expansion
+- wheel distribution expansion
+- FileMaker Pro/Server 19.5 hardware validation
 
-Tracking: #6. Blocked by Phases 0–1; strengthened by Phase 3.
+Existing code remains in the repository. Deferred status does not promote its evidence or imply that XML is a formal deliverable.
 
-- Synthetic system descriptions and tasks
-- Expected properties and forbidden assumptions
-- Version contamination and hallucination checks
-- Saved baselines and regression reports
+## Previous phase history
 
-Exit condition: repository changes can be shown to improve or preserve AI output quality.
+The former dependency-ordered phases are retained here for traceability.
 
-## Phase 5 — Source-backed FileMaker Server 19.5 catalog
-
-Tracking: #7. Blocked by Phase 0. Requires a focused Deep Research pass.
-
-- [x] Phase A: normalize all 59 researched script steps and their execution compatibility
-- [x] Phase A: add deterministic `compat` and `list-steps` reference CLI
-- [x] Phase A: keep compatibility, renderer implementation, and FileMaker evidence separate
-- [x] Phase B: add exactly five practical design patterns for JSON validation, primary-key find, create, update, and synchronous PSOS
-- [x] Phase B: validate pattern placeholders, sources, functions, context compatibility, and derived renderer status without changing XML or Script IR
-- Important functions, errors, paths, PSOS, schedules, import/export, ODBC, and plug-ins
-- Source IDs, confidence, evidence, and unknown/fail-closed states
-- Generated human/AI-readable documentation
-
-Phases A and B do not complete Phase 5: comprehensive function/error/environment guidance, unresolved research, and FileMaker 19.5 fixtures remain. The next implementation step is preparation for provenance-aware FileMaker Pro 19.5 fixture capture; the design-only patterns must not be promoted before that evidence exists.
-
-Exit condition: high-priority server-side design decisions can be made without ad hoc web research.
-
-## Phase 6 — Expand renderer coverage
-
-Blocked by Phases 1–3 and the relevant subset of Phase 5.
-
-Priority order:
-
-1. Control and contracts
-2. Layout/context and find operations
-3. Record create/update/commit/revert
-4. Server execution and integration
-5. Destructive or high-risk operations
-
-A step is not added merely because its XML is available. It must satisfy the evidence and Definition of Done requirements.
-
-## Phase 7 — Microsoft 365 Copilot knowledge package
-
-Tracking: #8. Blocked by Phases 0 and 5; benefits from Phases 2–4.
-
-- Deterministic Markdown generation from catalogs
-- Versioned package and limitations
-- Drift checks
-- Release archive for controlled internal import
-
-Exit condition: Microsoft 365 Copilot can use a compact, internally consistent package rather than searching the repository ad hoc.
-
-## Phase 8 — FileMaker 19.5 hardware validation
-
-Human/FileMaker environment required.
-
-- Clipboard format detection
-- Copy/read/write/paste round-trip
-- Step-by-step fixture capture
-- FileMaker Pro 19.5 paste validation
-- Hosted test file runtime validation
-- PSOS and server-schedule validation
-
-Exit condition: evidence can be promoted to `fm19_5_paste_verified`, `fm19_5_runtime_verified`, or `fmse_verified` as applicable.
+| Previous phase | Tracking | Historical result or current disposition |
+| --- | --- | --- |
+| Phase 0 — Governance foundation | #2 | Completed and retained in the Copilot foundation |
+| Phase 1 — Strict Script IR v2 | #3 | Completed; retained as a frozen experimental subsystem |
+| Phase 2 — Fixture and round-trip pipeline | #4 | Deferred |
+| Phase 3 — Static analyzer | #5 | Deferred |
+| Phase 4 — AI evaluation suite | #6 | Deferred |
+| Phase 5 — Source-backed 19.5 catalog | #7 | Phase A and Phase B completed; further work is selective |
+| Phase 6 — Expand renderer coverage | — | Deferred |
+| Phase 7 — M365 Copilot knowledge package | #8 | Reordered as the next central implementation step |
+| Phase 8 — FileMaker 19.5 hardware validation | — | Deferred and still required before any corresponding evidence promotion |
 
 ## Dependency rule
 
-A later phase may prototype interfaces, but it must not claim completion or promote evidence while prerequisite phases remain incomplete.
+Copilot knowledge work depends on the completed governance and public knowledge foundation. It does not depend on Issues #4–#6, renderer or clipboard expansion, Script IR expansion, wheel expansion, or hardware validation.
+
+No document, package, automated check, or Copilot output may be described as FileMaker paste-, runtime-, or FMSE-verified without the evidence required by [the evidence model](docs/EVIDENCE_MODEL.md).
