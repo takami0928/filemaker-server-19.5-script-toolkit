@@ -5,9 +5,12 @@ import json
 from pathlib import Path
 import unittest
 
+from jsonschema import Draft202012Validator
+
 from fms19_toolkit.compatibility import derive_renderer_metadata
 from fms19_toolkit.pattern_policy import (
     EXPECTED_PATTERN_IDS,
+    _collect_placeholder_tokens,
     _validate_pattern_documents,
     validate_practical_patterns,
 )
@@ -181,6 +184,102 @@ class PracticalPatternPolicyTests(unittest.TestCase):
         for pattern in self.documents["patterns"].values():
             for value in pattern["examples"].values():
                 self.assertIsNotNone(json.loads(value))
+
+    def test_success_result_with_error_object_is_rejected(self):
+        pattern = self._pattern(self.documents, "create-record")
+        success = json.loads(pattern["examples"]["successJson"])
+        failure = json.loads(pattern["examples"]["failureJson"])
+        success["error"] = failure["error"]
+
+        validator = Draft202012Validator(self.documents["result_schema"])
+        self.assertFalse(validator.is_valid(success))
+
+    def test_failure_result_with_null_error_is_rejected(self):
+        pattern = self._pattern(self.documents, "create-record")
+        failure = json.loads(pattern["examples"]["failureJson"])
+        failure["error"] = None
+
+        validator = Draft202012Validator(self.documents["result_schema"])
+        self.assertFalse(validator.is_valid(failure))
+
+    def test_all_success_examples_satisfy_common_result_schema(self):
+        validator = Draft202012Validator(self.documents["result_schema"])
+        for path, pattern in self.documents["patterns"].items():
+            with self.subTest(pattern=path):
+                value = json.loads(pattern["examples"]["successJson"])
+                self.assertEqual(list(validator.iter_errors(value)), [])
+
+    def test_all_failure_examples_satisfy_common_result_schema(self):
+        validator = Draft202012Validator(self.documents["result_schema"])
+        for path, pattern in self.documents["patterns"].items():
+            with self.subTest(pattern=path):
+                value = json.loads(pattern["examples"]["failureJson"])
+                self.assertEqual(list(validator.iter_errors(value)), [])
+
+    def test_undeclared_placeholder_token_is_rejected(self):
+        def mutate(documents):
+            pattern = self._pattern(documents, "create-record")
+            pattern["happyPath"].append("Use {{UNDECLARED_TARGET}}.")
+
+        errors = self._errors(mutate)
+        self.assertTrue(
+            any(
+                "undeclared placeholder token(s): ['UNDECLARED_TARGET']"
+                in error
+                for error in errors
+            )
+        )
+
+    def test_placeholder_token_typo_is_rejected(self):
+        def mutate(documents):
+            pattern = self._pattern(documents, "create-record")
+            pattern["happyPath"][2] = pattern["happyPath"][2].replace(
+                "{{TARGET_LAYOUT}}",
+                "{{TARGET_LAYOT}}",
+            )
+
+        errors = self._errors(mutate)
+        self.assertTrue(
+            any(
+                "undeclared placeholder token(s): ['TARGET_LAYOT']" in error
+                for error in errors
+            )
+        )
+
+    def test_unused_declared_placeholder_is_rejected(self):
+        def mutate(documents):
+            pattern = self._pattern(documents, "create-record")
+            pattern["placeholders"].append(
+                {
+                    "name": "UNUSED_PLACEHOLDER",
+                    "kind": "calculation",
+                    "required": True,
+                    "resolutionSource": "an explicit synthetic test contract",
+                    "unresolvedBehavior": "block_generation",
+                }
+            )
+
+        errors = self._errors(mutate)
+        self.assertTrue(
+            any(
+                "unused declared placeholder(s): ['UNUSED_PLACEHOLDER']"
+                in error
+                for error in errors
+            )
+        )
+
+    def test_all_31_declared_placeholders_are_used(self):
+        count = 0
+        for path, pattern in self.documents["patterns"].items():
+            with self.subTest(pattern=path):
+                declared = {
+                    placeholder["name"]
+                    for placeholder in pattern["placeholders"]
+                }
+                used = _collect_placeholder_tokens(pattern)
+                self.assertEqual(declared, used)
+                count += len(pattern["placeholders"])
+        self.assertEqual(count, 31)
 
     def test_unregistered_step_is_rejected(self):
         def mutate(documents):

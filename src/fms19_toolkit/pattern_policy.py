@@ -108,6 +108,7 @@ FORBIDDEN_ID_KEYS = {
     "numericstepid",
 }
 PLACEHOLDER_NAME_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+PLACEHOLDER_TOKEN_RE = re.compile(r"\{\{([A-Z][A-Z0-9_]*)\}\}")
 VERSION_RE = re.compile(r"^\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?")
 NUMERIC_FMXML_ID_RE = re.compile(
     r"fmxmlsnippet.{0,80}\b(?:id|step\s+id)\b.{0,20}\b\d+\b",
@@ -164,6 +165,19 @@ def _after_19_5(value: Any) -> bool:
 
 def _nonempty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def _collect_placeholder_tokens(value: Any) -> set[str]:
+    tokens: set[str] = set()
+    if isinstance(value, dict):
+        for child in value.values():
+            tokens.update(_collect_placeholder_tokens(child))
+    elif isinstance(value, list):
+        for child in value:
+            tokens.update(_collect_placeholder_tokens(child))
+    elif isinstance(value, str):
+        tokens.update(PLACEHOLDER_TOKEN_RE.findall(value))
+    return tokens
 
 
 def _validate_string_array(
@@ -384,7 +398,6 @@ def _validate_placeholders(
         errors.append(f"{label}.placeholders: must be a non-empty array")
         return
     names: list[str] = []
-    serialized = json.dumps(pattern, ensure_ascii=False)
     for index, placeholder in enumerate(placeholders):
         item_label = f"{label}.placeholders[{index}]"
         if not isinstance(placeholder, dict):
@@ -397,11 +410,6 @@ def _validate_placeholders(
             errors.append(f"{item_label}: invalid placeholder name {name!r}")
         else:
             names.append(name)
-            if f"{{{{{name}}}}}" not in serialized:
-                errors.append(
-                    f"{item_label}: placeholder must be referenced as "
-                    f"{{{{{name}}}}}"
-                )
         if not _nonempty_string(placeholder.get("kind")):
             errors.append(f"{item_label}: kind must be a non-empty string")
         if not isinstance(placeholder.get("required"), bool):
@@ -434,6 +442,20 @@ def _validate_placeholders(
         errors.append(
             f"{label}.placeholders: duplicate placeholder(s): "
             f"{sorted(duplicates)}"
+        )
+    declared = set(names)
+    used = _collect_placeholder_tokens(pattern)
+    undeclared = sorted(used - declared)
+    if undeclared:
+        errors.append(
+            f"{label}.placeholders: undeclared placeholder token(s): "
+            f"{undeclared}"
+        )
+    unused = sorted(declared - used)
+    if unused:
+        errors.append(
+            f"{label}.placeholders: unused declared placeholder(s): "
+            f"{unused}"
         )
 
 
