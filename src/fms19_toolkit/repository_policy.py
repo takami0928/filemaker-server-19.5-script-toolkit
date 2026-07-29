@@ -10,6 +10,8 @@ from urllib.parse import urlparse
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
+from fms19_toolkit.research_policy import validate_issue_7_research
+
 EVIDENCE_LEVELS = (
     "documented",
     "public_fixture_observed",
@@ -556,4 +558,5 @@ def check_repository(root: str | Path) -> list[str]:
     known_sources = _validate_source_registry(root_path, errors)
     _validate_step_catalog(root_path, known_sources, errors)
     _validate_script_ir_artifacts(root_path, errors)
+    errors.extend(validate_issue_7_research(root_path))
     return errors

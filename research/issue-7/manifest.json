@@ -1,9 +1,10 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "issue": 7,
   "generatedAt": "2026-07-29",
   "target": "FileMaker Server 19.5 / FileMaker Pro 19.5",
   "classification": "research-candidate",
+  "canonicalRoot": "candidates",
   "validation": {
     "sources": 110,
     "steps": 59,
@@ -12,7 +13,7 @@
     "functions": 24,
     "errors": 117,
     "exclusionsAndTransitions": 15,
-    "unresolved": 20,
+    "unresolvedQuestions": 20,
     "coverageDomains": 18,
     "duplicateSourceIds": 0,
     "duplicateStepNames": 0,
@@ -21,59 +22,42 @@
     "fileMakerPro19_5PasteVerified": false,
     "fileMakerServer19_5RuntimeVerified": false
   },
-  "directFiles": [
-    "README.md",
-    "coverage-audit.json",
-    "unresolved-questions.json",
-    "revision-notes.md"
+  "files": [
+    {
+      "path": "candidates/deep-research-report.md",
+      "bytes": 62259,
+      "sha256": "8e707c2f73554f25913bb0c1c28d481f41d16cb5502d87039e2383a1cf93b4c5"
+    },
+    {
+      "path": "candidates/source-registry-candidates.json",
+      "bytes": 53455,
+      "sha256": "a658100b1fa1a020110ccfe7a7181676092631ebddaa0ee3e8b6495e760bb3e9"
+    },
+    {
+      "path": "candidates/script-step-catalog-candidates.json",
+      "bytes": 154187,
+      "sha256": "4c65d18e7ab7b7b7943da2e22e519218e91317c729ecd6b5f673b31a02c1702e"
+    },
+    {
+      "path": "candidates/unresolved-questions.json",
+      "bytes": 13574,
+      "sha256": "4cf49ad59275c1074cfa6a62e096fbabfd7932af13d6e42397dbbeaf8419ae2c"
+    },
+    {
+      "path": "candidates/coverage-audit.json",
+      "bytes": 5708,
+      "sha256": "2b3ed862920a2ae78137a7ba7b9687c3ef2eed4c9700fc4f35d1b3904035ba16"
+    },
+    {
+      "path": "candidates/revision-notes.md",
+      "bytes": 1004,
+      "sha256": "b0bdc4647168767a46b10727a9b3819b810181565d89003611d955b94336c2fe"
+    },
+    {
+      "path": "candidates/manifest.json",
+      "bytes": 1670,
+      "sha256": "bcacec8c99fd08f479e9aad29621f5c39edc5a358244e5c7fc371483741e043f"
+    }
   ],
-  "completeBundle": {
-    "format": "ZIP split into six binary parts",
-    "reconstructionInstructions": "README.md",
-    "reconstructedFilename": "issue-7-deep-research-artifacts.zip",
-    "reconstructedBytes": 47115,
-    "reconstructedSha256": "a441f25400fcccd37e755019fe9d4de5a536a5a176a4592e320dcacee69ec278",
-    "contents": [
-      "README.md",
-      "source-registry-candidates.json",
-      "script-step-catalog-candidates.json",
-      "unresolved-questions.json",
-      "coverage-audit.json",
-      "revision-notes.md",
-      "manifest.json"
-    ],
-    "parts": [
-      {
-        "path": "bundle/issue-7-deep-research-artifacts.zip.part01",
-        "bytes": 7852,
-        "sha256": "8942eb17260694093d7565c5b08f77f479eff602c197c53784af48e27d04080d"
-      },
-      {
-        "path": "bundle/issue-7-deep-research-artifacts.zip.part02",
-        "bytes": 7853,
-        "sha256": "7bfae32b6b3f2910b9413391e821bee837fe0b705161572974921f9e3f6658ec"
-      },
-      {
-        "path": "bundle/issue-7-deep-research-artifacts.zip.part03",
-        "bytes": 7853,
-        "sha256": "9a8d4f729c6381abdc18ce2b21fc6948db4b7d71efded6387597fd2717abbba6"
-      },
-      {
-        "path": "bundle/issue-7-deep-research-artifacts.zip.part04",
-        "bytes": 7852,
-        "sha256": "a5a4228ef68a0f8f200fe9e6cf34b818dc93f3ec132da5bb6fb4dd5423591460"
-      },
-      {
-        "path": "bundle/issue-7-deep-research-artifacts.zip.part05",
-        "bytes": 7852,
-        "sha256": "41030ca10548426f109f6d0d7cbe698bf5843ec2423226c09d5cf4e22a9285c7"
-      },
-      {
-        "path": "bundle/issue-7-deep-research-artifacts.zip.part06",
-        "bytes": 7853,
-        "sha256": "c5325ff061b8d5b4090a784a8aa2d95bdb207497cab46ac13d76ba1fb72058a4"
-      }
-    ]
-  },
-  "promotionPolicy": "Do not copy research candidates into the verified renderer catalog without the evidence required by docs/EVIDENCE_MODEL.md. Partial and unresolved compatibility remain fail-closed."
+  "promotionPolicy": "Do not copy research candidates into the verified renderer catalog without the evidence required by docs/EVIDENCE_MODEL.md. Partial, unknown, later-version, DDR-ID, and public-fixture claims remain fail-closed."
 }
