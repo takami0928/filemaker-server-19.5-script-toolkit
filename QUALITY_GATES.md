@@ -7,6 +7,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 **Blocking**
 
 - No company-specific table, field, TO, layout, script, account, server, URL, credential, DDR, Save a Copy as XML output, screenshot, log, or production data.
+- Copilot-facing public documents and any SharePoint public-knowledge package contain no internal system information.
 - Examples use synthetic names and values.
 - Secrets are neither committed nor requested by tests.
 
@@ -17,6 +18,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 - Target remains FileMaker Server 19.5 and FileMaker Pro 19.5 unless a separate compatibility track is explicitly approved.
 - Client, PSOS, and server-schedule behavior are not conflated.
 - Later-version features are not represented as 19.5 capabilities.
+- Copilot-facing documents state the target version, evidence boundary, and FileMaker Pro/Server 19.5-unverified status where applicable.
 
 ## G2 — Source and claim traceability
 
@@ -26,6 +28,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 - Primary Claris documentation is preferred where available.
 - Secondary sources cannot independently promote a claim beyond `public_fixture_observed`.
 - Unknown behavior remains `unknown` or fail-closed.
+- Content copied from an external upstream requires a confirmed license and all required attribution. A reference link alone does not authorize copying.
 
 ## G3 — Evidence honesty
 
@@ -35,12 +38,17 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 - Evidence levels are monotonic and cannot skip required proof.
 - Automated tests cannot claim FileMaker paste, runtime, or FMSE verification.
 - Script IR input cannot self-assert XML generation or FileMaker verification.
-- Documentation distinguishes design-ready, XML-generated, paste-verified, runtime-verified, and FMSE-verified states.
+- Documentation distinguishes `draft_design` from `implementation_ready`.
+- XML output and automated-check results are reported as separate dimensions.
+- FileMaker Pro 19.5 paste, FileMaker Pro 19.5 client runtime, and FileMaker Server 19.5 FMSE results are reported separately, including explicit `not_run` states.
+- Legacy `design_ready` and `xml_generated` labels follow the mappings in `docs/EVIDENCE_MODEL.md`; they do not replace the repository-wide report.
+- CI success cannot set paste, client runtime, or FMSE verification to `passed`.
 
 ## G4 — XML and catalog integrity
 
 **Blocking for XML/catalog changes**
 
+- A Copilot knowledge-document-only change does not require XML fixtures, Script IR changes, renderer changes, or parser changes.
 - Unknown steps are denied by default.
 - Step name and numeric ID are catalog-backed.
 - New step support includes catalog data, source references, fixture/provenance metadata, parser/renderer support where applicable, and tests.
@@ -86,6 +94,8 @@ Required before stable releases and recommended for every substantive PR.
 - Unresolved P0/P1 findings block merge.
 
 ## Release gates
+
+These alpha, beta, and stable gates apply to releases of the experimental XML/clipboard toolkit. They do not make the deferred AI evaluation suite a prerequisite for the Copilot knowledge package.
 
 ### Alpha
 

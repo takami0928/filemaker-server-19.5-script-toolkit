@@ -1,6 +1,8 @@
 # Maturity Model
 
-The maturity level describes the repository as a whole. Individual steps and patterns retain their own evidence levels.
+These maturity levels describe the retained experimental XML, Script IR, and clipboard subsystem. They do not describe the progress of the Copilot knowledge package or the quality of a Copilot-generated human-readable design. Those states are reported separately in `ROADMAP.md` and `docs/KNOWN_LIMITATIONS.md`.
+
+Individual steps and patterns retain their own evidence levels.
 
 ## M0 — Documentation only
 
@@ -19,7 +21,7 @@ The maturity level describes the repository as a whole. Individual steps and pat
 - Strict IR represents execution mode, contracts, context, variables, and object references.
 - Invalid native v2 designs and unresolved FileMaker object references fail before XML output; legacy v1 rendering retains explicit migration limitations.
 
-Current repository level after the governance foundation and strict Script IR v2 work through Issue #3.
+Current experimental subsystem level after the governance foundation and strict Script IR v2 work through Issue #3.
 
 ## M3 — Fixture-backed compiler
 
@@ -39,11 +41,11 @@ Current repository level after the governance foundation and strict Script IR v2
 - High-priority supported steps are paste-verified.
 - Representative client and hosted-file scripts are runtime-verified.
 
-## M6 — FMSE-validated server toolkit
+## M6 — FMSE-validated experimental server toolkit
 
 - Core PSOS and server-schedule patterns are verified on FileMaker Server 19.5.
-- Compatibility catalog and Copilot knowledge package are complete for supported scope.
-- Stable releases are reproducible and independently reviewed.
+- Supported XML and clipboard workflows are complete for the stated experimental scope.
+- Experimental releases are reproducible and independently reviewed.
 
 ## Level assignment rules
 

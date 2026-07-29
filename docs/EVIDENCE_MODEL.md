@@ -88,17 +88,70 @@ A claim may carry multiple applicable evidence values. For example, a server-com
 - A successful client execution is not FMSE evidence.
 - One step or pattern's evidence must not be generalized to unrelated steps.
 
-## Evidence state in outputs
+## Repository-wide completion reporting
 
-AI and tooling should use these user-facing states:
+Repository-wide completion reporting keeps three concepts separate:
 
-- `design_ready`: design and required references are complete
-- `xml_generated`: XML was generated and automated checks passed
-- `paste_verified`: maps to `fm19_5_paste_verified`
-- `runtime_verified`: maps to `fm19_5_runtime_verified`
-- `fmse_verified`: maps directly to `fmse_verified`
+1. the completeness of a human-readable design;
+2. XML generation and automated-check results;
+3. FileMaker Pro/Server 19.5 device evidence.
 
-Unverified states must be shown explicitly rather than omitted.
+These reporting dimensions are not additional evidence levels and do not form a single monotonic maturity chain. The ordered evidence levels and promotion rules above remain unchanged.
+
+| Dimension | Values | Meaning |
+| --- | --- | --- |
+| Design status | `draft_design`, `implementation_ready` | Completeness of the human-readable design document |
+| XML output | `not_requested`, `not_generated`, `generated` | Whether an XML file was requested and actually generated |
+| Automated checks | `not_run`, `passed`, `failed` | Result of the required automated checks for the relevant XML |
+| Paste verification | `not_run`, `passed`, `failed` | FileMaker Pro 19.5 paste result |
+| Client runtime verification | `not_run`, `passed`, `failed` | FileMaker Pro 19.5 client runtime result |
+| FMSE verification | `not_run`, `passed`, `failed` | FileMaker Server 19.5 PSOS or schedule result |
+
+Rules:
+
+- Design status is not FileMaker evidence.
+- `implementation_ready` does not imply XML generation or any FileMaker verification.
+- If XML was not requested, report `XML output: not_requested`.
+- If XML was generated but automated checks are `failed` or `not_run`, do not describe it as validated or verified XML.
+- Report paste, client runtime, and FMSE verification separately.
+- Show `not_run` explicitly instead of omitting the dimension.
+- CI success does not set paste, client runtime, or FMSE verification to `passed`.
+- A `passed` FileMaker verification result requires the corresponding evidence record and metadata defined by the ordered evidence level; the report itself does not promote evidence.
+- Evidence for one step or pattern must not be generalized to another.
+
+### Legacy user-facing labels
+
+#### `design_ready`
+
+`design_ready` is a frozen legacy Script IR v2 value. It indicates only that the required references and blocking issues represented in that Script IR are resolved.
+
+Do not automatically equate `design_ready` with the repository-wide `implementation_ready` status. A human-readable design may be reported as `implementation_ready` only after it separately satisfies the current required conditions in `AI_GUIDE.md`.
+
+#### `xml_generated`
+
+`xml_generated` remains a legacy success label for the state in which XML was generated and the required automated checks passed. It does not mean merely that a raw XML file exists.
+
+If XML was generated but checks were not run or failed, use the repository-wide dimensions instead:
+
+```text
+XML output: generated
+Automated checks: not_run
+```
+
+or:
+
+```text
+XML output: generated
+Automated checks: failed
+```
+
+Do not promote either state to the legacy `xml_generated` success label.
+
+The other legacy user-facing mappings remain:
+
+- `paste_verified` maps to `fm19_5_paste_verified`
+- `runtime_verified` maps to `fm19_5_runtime_verified`
+- `fmse_verified` maps directly to `fmse_verified`
 
 ### Script IR v2 input boundary
 
