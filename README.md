@@ -12,6 +12,7 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 - クライアント実行とFileMaker Script Engine（FMSE）実行の境界
 - 19.5を対象とした互換性・禁止事項の管理方法
 - 全59ステップの正規化互換性カタログと検索・一覧CLI
+- JSON検証、1件検索、作成、更新、PSOSの5つの実用スクリプト設計パターン
 - `fmxmlsnippet`の構造検査
 - WindowsのFileMaker専用クリップボード形式への読み書き
 - 厳格なScript IR v2、v1からの決定的移行、JSON Schema検証
@@ -115,6 +116,22 @@ FileMaker Pro 19.5でホストファイルを開き、スクリプトワーク�
 
 詳細は[FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)、設計判断は[ADR 0003](decisions/0003-normalize-compatibility-catalog-and-cli.md)を参照してください。
 
+## 実用スクリプト設計パターン
+
+`patterns/fm19.5/`には、AIと人間が業務スクリプトを設計するためのPhase B成果物として、次の5パターンだけを保存しています。
+
+1. JSONスクリプト引数の受取と検証
+2. 主キーによる1件検索
+3. レコード新規作成とCommit確認
+4. レコード更新、ロック確認、Commit確認
+5. Wait for completion OnのPSOS呼出しとJSON結果返却
+
+各ディレクトリの`pattern.json`が機械可読な正本で、READMEは人間向け説明です。対象ファイル固有のレイアウト、TO、フィールド、スクリプト、計算式はプレースホルダーで表し、必須値が未解決なら`block_generation`として完成スクリプトの出力を止めます。内部FileMaker IDを生成・推測しません。
+
+各ステップのcontext別互換性は59件の正規カタログと照合し、renderer statusは`catalog/fm19.5/verified-steps.json`から再計算します。`not_verified`なステップも設計には利用できますが、XML生成可能とは扱いません。全パターンは`design_only`で、FileMaker Pro／Server 19.5実機未検証です。XML renderer、Script IR、verified catalogはPhase Bで変更していません。
+
+パターン集は現時点ではリポジトリ設計資料であり、CLIやruntime APIを提供しないためwheelへ同梱していません。利用手順と証拠境界は[実用スクリプト設計パターン](patterns/README.md)を参照してください。
+
 ## 現在のレンダラー対応ステップ
 
 初期版では、構造を保守的に確認できる次のステップだけをJSONから生成します。
@@ -163,6 +180,7 @@ Win32クリップボードAPIを使う`clipboard-read`、`clipboard-write`、`cl
 - [FileMaker Server 19.5実行境界](docs/FM_SERVER_19_5.md)
 - [Script IR](docs/SCRIPT_IR.md)
 - [FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)
+- [実用スクリプト設計パターン](patterns/README.md)
 - [スクリプト作法](docs/SCRIPT_STYLE.md)
 - [サーバー実行設計](docs/SERVER_EXECUTION.md)
 - [XML・クリップボード](docs/XML_CLIPBOARD.md)

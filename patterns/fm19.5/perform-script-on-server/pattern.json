@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "id": "perform-script-on-server",
+  "title": "Perform a server script and return JSON",
+  "target": {
+    "fileMakerPro": "19.5",
+    "fileMakerServer": "19.5"
+  },
+  "purpose": "Call an explicitly resolved server script with a versioned JSON request, wait for completion, and separate call failure from the server script's JSON business result.",
+  "composesPatterns": [
+    "json-parameter-validation"
+  ],
+  "supportedContexts": [
+    "client"
+  ],
+  "preconditions": [
+    "The target file is hosted and Perform Script on Server is configured for Wait for completion On.",
+    "The server script name is resolved from target-solution metadata and the caller has permission to invoke it.",
+    "The server script implements the json-parameter-validation pattern before business work.",
+    "The server script uses {{SERVER_CONTEXT_PLAN}} to rebuild every required layout, found set, and current record in its independent FMSE session.",
+    "Related-file authentication and the handling of retries or duplicate requests are explicitly designed."
+  ],
+  "inputContract": {
+    "format": "json",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "operation",
+        "payload"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "outputContract": {
+    "schemaRef": "patterns/fm19.5/common-result.schema.json",
+    "successCodes": [
+      "OK"
+    ],
+    "errorCodes": [
+      "PSOS_CALL_FAILED",
+      "PSOS_TIMEOUT",
+      "PSOS_STOPPED",
+      "PSOS_CAPACITY_UNAVAILABLE",
+      "INVALID_SERVER_RESULT",
+      "DUPLICATE_REQUEST",
+      "SERVER_BUSINESS_ERROR"
+    ]
+  },
+  "placeholders": [
+    {
+      "name": "SERVER_SCRIPT_NAME",
+      "kind": "script",
+      "required": true,
+      "resolutionSource": "target FileMaker solution metadata",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "REQUEST_SCHEMA_VERSION",
+      "kind": "contractVersion",
+      "required": true,
+      "resolutionSource": "the approved caller/server API contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "REQUEST_ID_EXPRESSION",
+      "kind": "calculation",
+      "required": true,
+      "resolutionSource": "the caller's approved request-correlation rule",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "OPERATION_NAME",
+      "kind": "contractValue",
+      "required": true,
+      "resolutionSource": "the approved caller/server API contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "PAYLOAD_EXPRESSION",
+      "kind": "calculation",
+      "required": true,
+      "resolutionSource": "validated caller data mapped by the approved API contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "SERVER_CONTEXT_PLAN",
+      "kind": "designPlan",
+      "required": true,
+      "resolutionSource": "target FileMaker solution metadata plus one or more applicable practical patterns",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "SENSITIVE_JSON_KEYS",
+      "kind": "jsonKeyList",
+      "required": true,
+      "resolutionSource": "the security and logging requirements",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "RELATED_FILE_AUTHENTICATION_PLAN",
+      "kind": "securityDecision",
+      "required": true,
+      "resolutionSource": "the hosting, privilege, and related-file deployment design; resolve to not_applicable when no related file is used",
+      "unresolvedBehavior": "block_generation"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Set Error Capture",
+      "purpose": "Keep caller-side invocation errors and server-side validation errors under explicit script control.",
+      "requiredContexts": [
+        "client",
+        "psos"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {
+        "psos": "FMSE always behaves as Set Error Capture On; do not depend on an Off state."
+      }
+    },
+    {
+      "name": "Set Variable",
+      "purpose": "Store the request JSON, call error, raw script result, and parsed result in local variables.",
+      "requiredContexts": [
+        "client",
+        "psos"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Perform Script on Server",
+      "purpose": "Invoke {{SERVER_SCRIPT_NAME}} with Wait for completion On and the explicit JSON request.",
+      "requiredContexts": [
+        "client"
+      ],
+      "compatibility": {
+        "client": "available"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {}
+    },
+    {
+      "name": "If",
+      "purpose": "Branch first on caller-side invocation error and then on the server JSON result.",
+      "requiredContexts": [
+        "client",
+        "psos"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Else",
+      "purpose": "Keep transport/session failures separate from server business failures.",
+      "requiredContexts": [
+        "client",
+        "psos"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "End If",
+      "purpose": "Close call and business-result branches explicitly.",
+      "requiredContexts": [
+        "client",
+        "psos"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Exit Script",
+      "purpose": "Return the common JSON result from the server and, if this wrapper is itself called, from the caller.",
+      "requiredContexts": [
+        "client",
+        "psos"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    }
+  ],
+  "functions": [
+    {
+      "name": "Get ( ScriptParameter )",
+      "purpose": "Read the explicit request in the server script.",
+      "sourceIds": [
+        "claris-fm19-function-get-scriptparameter"
+      ]
+    },
+    {
+      "name": "Get ( ScriptResult )",
+      "purpose": "Read the server script result after Wait for completion On.",
+      "sourceIds": [
+        "claris-fm19-function-get-scriptresult"
+      ]
+    },
+    {
+      "name": "Get ( LastError )",
+      "purpose": "Capture the caller-side Perform Script on Server error immediately.",
+      "sourceIds": [
+        "claris-fm19-function-get-lasterror"
+      ]
+    },
+    {
+      "name": "JSONFormatElements",
+      "purpose": "Validate that the returned result can be parsed as JSON.",
+      "sourceIds": [
+        "claris-fm19-function-jsonformatelements"
+      ]
+    },
+    {
+      "name": "JSONGetElement",
+      "purpose": "Inspect the server result envelope without conflating it with the call error.",
+      "sourceIds": [
+        "claris-fm19-function-jsongetelement"
+      ]
+    },
+    {
+      "name": "JSONSetElement",
+      "purpose": "Build the versioned request and caller-side error result.",
+      "sourceIds": [
+        "claris-fm19-function-jsonsetelement"
+      ]
+    }
+  ],
+  "happyPath": [
+    "Build JSON containing schemaVersion {{REQUEST_SCHEMA_VERSION}}, requestId from {{REQUEST_ID_EXPRESSION}}, operation {{OPERATION_NAME}}, and payload from {{PAYLOAD_EXPRESSION}}.",
+    "Invoke {{SERVER_SCRIPT_NAME}} with Wait for completion On.",
+    "Immediately store Get ( LastError ) as the call-level result, then store Get ( ScriptResult ) separately.",
+    "In the independent FMSE session, validate Get ( ScriptParameter ) again, do not use caller variables or global-field values, and execute {{SERVER_CONTEXT_PLAN}} to rebuild layout, found set, and current record.",
+    "Have the server script return the common JSON envelope with Exit Script.",
+    "On the caller, reject a nonzero call error before interpreting the business result.",
+    "Validate and parse the returned JSON, then propagate its OK or business-error envelope without relabeling it as a call failure."
+  ],
+  "errorBranches": [
+    {
+      "code": "PSOS_CALL_FAILED",
+      "trigger": "Perform Script on Server returns a nonzero caller-side error not classified more specifically by the resolved deployment.",
+      "fileMakerCodes": [],
+      "action": "Return the preserved call error and do not manufacture a server business result."
+    },
+    {
+      "code": "PSOS_TIMEOUT",
+      "trigger": "The resolved deployment reports that the synchronous server call did not finish within its allowed time.",
+      "fileMakerCodes": [],
+      "action": "Treat completion as unknown and use requestId/idempotency before any retry."
+    },
+    {
+      "code": "PSOS_STOPPED",
+      "trigger": "An administrator or server shutdown stops the FMSE session.",
+      "fileMakerCodes": [],
+      "action": "Treat business completion as unknown and reconcile by requestId."
+    },
+    {
+      "code": "PSOS_CAPACITY_UNAVAILABLE",
+      "trigger": "The deployment cannot start another server session because capacity is unavailable.",
+      "fileMakerCodes": [],
+      "action": "Return a retryable infrastructure result only under a bounded retry policy."
+    },
+    {
+      "code": "INVALID_SERVER_RESULT",
+      "trigger": "The call succeeds but Get ( ScriptResult ) is empty, malformed JSON, or not the common result contract.",
+      "fileMakerCodes": [],
+      "action": "Return a contract error and preserve the raw result only in access-controlled diagnostics."
+    },
+    {
+      "code": "DUPLICATE_REQUEST",
+      "trigger": "The server-side idempotency rule determines that requestId was already processed.",
+      "fileMakerCodes": [],
+      "action": "Return the prior logical outcome or the approved duplicate conflict."
+    },
+    {
+      "code": "SERVER_BUSINESS_ERROR",
+      "trigger": "The call succeeds and the server returns a valid envelope with ok false.",
+      "fileMakerCodes": [],
+      "action": "Preserve the server code/message as a business result; do not relabel it as a PSOS call failure."
+    }
+  ],
+  "concurrencyNotes": [
+    "Perform Script on Server creates an independent FMSE session and does not inherit layout, found set, current record, sort order, variables, or global-field values.",
+    "Timeout or interruption can leave completion unknown; requestId and an approved idempotency design are required before retrying a write.",
+    "Concurrent or nested PSOS calls consume independent sessions and must respect deployment capacity.",
+    "Wait for completion Off is outside the completed pattern because the initiating script cannot depend on a result handoff."
+  ],
+  "securityNotes": [
+    "Do not send credentials or unnecessary sensitive data in the script parameter.",
+    "Redact values for {{SENSITIVE_JSON_KEYS}} in caller and server logs.",
+    "Resolve {{RELATED_FILE_AUTHENTICATION_PLAN}} explicitly; a client-authenticated related file must not be assumed available to FMSE.",
+    "Log only approved metadata such as requestId, operation, result code, and non-sensitive diagnostic context.",
+    "Verify that the calling account may run {{SERVER_SCRIPT_NAME}} and access every object in {{SERVER_CONTEXT_PLAN}}."
+  ],
+  "examples": {
+    "inputJson": "{\n  \"schemaVersion\": 1,\n  \"requestId\": \"req-synthetic-005\",\n  \"operation\": \"synthetic-operation\",\n  \"payload\": {\n    \"primaryKey\": \"synthetic-key-005\"\n  }\n}",
+    "successJson": "{\n  \"ok\": true,\n  \"code\": \"OK\",\n  \"message\": \"\",\n  \"data\": {\n    \"requestId\": \"req-synthetic-005\",\n    \"processed\": true\n  },\n  \"error\": null,\n  \"meta\": {\n    \"pattern\": \"perform-script-on-server\",\n    \"schemaVersion\": 1\n  }\n}",
+    "failureJson": "{\n  \"ok\": false,\n  \"code\": \"PSOS_CALL_FAILED\",\n  \"message\": \"The server script could not be started or completed.\",\n  \"data\": null,\n  \"error\": {\n    \"fileMakerCode\": null,\n    \"step\": \"Perform Script on Server\",\n    \"details\": \"\"\n  },\n  \"meta\": {\n    \"pattern\": \"perform-script-on-server\",\n    \"schemaVersion\": 1\n  }\n}"
+  },
+  "sourceIds": [
+    "claris-fm19-functions-reference",
+    "claris-fm19-function-get-lasterror",
+    "claris-fm19-function-get-scriptparameter",
+    "claris-fm19-function-get-scriptresult",
+    "claris-fm19-function-jsonformatelements",
+    "claris-fm19-function-jsongetelement",
+    "claris-fm19-function-jsonsetelement",
+    "claris-fm19-running-scripts-on-server",
+    "claris-fm19-script-steps-reference",
+    "claris-fm19-step-else",
+    "claris-fm19-step-end-if",
+    "claris-fm19-step-exit-script",
+    "claris-fm19-step-if-script-step",
+    "claris-fm19-step-perform-script-on-server",
+    "claris-fm19-step-set-error-capture",
+    "claris-fm19-step-set-variable"
+  ],
+  "verificationStatus": "design_only"
+}

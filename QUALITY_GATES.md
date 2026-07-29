@@ -45,6 +45,9 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 - Step name and numeric ID are catalog-backed.
 - New step support includes catalog data, source references, fixture/provenance metadata, parser/renderer support where applicable, and tests.
 - Unresolved FileMaker object IDs are not invented or silently defaulted.
+- Practical patterns contain exactly the approved five IDs, remain `design_only`, and resolve every required placeholder with `block_generation`.
+- Pattern step/context claims match the normalized compatibility catalog; `partial` conditions are explicit, `unknown`/`unavailable` are rejected, and renderer status is derived from the verified catalog.
+- Pattern functions and numeric error examples are limited to source-backed FileMaker 19.5 research candidates and cannot introduce later-version behavior.
 
 ## G5 — Code quality
 

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "target": {
+    "fileMakerPro": "19.5",
+    "fileMakerServer": "19.5"
+  },
+  "verificationStatus": "design_only",
+  "patterns": [
+    {
+      "id": "create-record",
+      "path": "create-record/pattern.json"
+    },
+    {
+      "id": "find-one-by-primary-key",
+      "path": "find-one-by-primary-key/pattern.json"
+    },
+    {
+      "id": "json-parameter-validation",
+      "path": "json-parameter-validation/pattern.json"
+    },
+    {
+      "id": "perform-script-on-server",
+      "path": "perform-script-on-server/pattern.json"
+    },
+    {
+      "id": "update-record",
+      "path": "update-record/pattern.json"
+    }
+  ]
+}

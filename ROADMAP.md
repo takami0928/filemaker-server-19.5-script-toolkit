@@ -75,11 +75,13 @@ Tracking: #7. Blocked by Phase 0. Requires a focused Deep Research pass.
 - [x] Phase A: normalize all 59 researched script steps and their execution compatibility
 - [x] Phase A: add deterministic `compat` and `list-steps` reference CLI
 - [x] Phase A: keep compatibility, renderer implementation, and FileMaker evidence separate
+- [x] Phase B: add exactly five practical design patterns for JSON validation, primary-key find, create, update, and synchronous PSOS
+- [x] Phase B: validate pattern placeholders, sources, functions, context compatibility, and derived renderer status without changing XML or Script IR
 - Important functions, errors, paths, PSOS, schedules, import/export, ODBC, and plug-ins
 - Source IDs, confidence, evidence, and unknown/fail-closed states
 - Generated human/AI-readable documentation
 
-Phase A does not complete Phase 5: functions, errors, environment guidance, unresolved research, fixtures, and practical server-script patterns remain.
+Phases A and B do not complete Phase 5: comprehensive function/error/environment guidance, unresolved research, and FileMaker 19.5 fixtures remain. The next implementation step is preparation for provenance-aware FileMaker Pro 19.5 fixture capture; the design-only patterns must not be promoted before that evidence exists.
 
 Exit condition: high-priority server-side design decisions can be made without ad hoc web research.
 

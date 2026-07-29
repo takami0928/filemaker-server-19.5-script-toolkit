@@ -133,6 +133,128 @@
       "retrievedAt": "2026-07-28",
       "status": "active",
       "notes": "Useful for public fixture observation and implementation comparison; not sufficient for 19.5 paste/runtime evidence."
+    },
+    {
+      "id": "claris-fm19-functions-reference",
+      "title": "Functions reference",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/functions-reference.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "Function inventory and individual function entry point",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-get-scriptparameter",
+      "title": "Get ( ScriptParameter )",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/get-scriptparameter.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "Get ( ScriptParameter ): format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-get-scriptresult",
+      "title": "Get ( ScriptResult )",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/get-scriptresult.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "Get ( ScriptResult ): format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-get-lasterror",
+      "title": "Get ( LastError )",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/get-lasterror.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "Get ( LastError ): format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-get-foundcount",
+      "title": "Get ( FoundCount )",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/get-foundcount.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "Get ( FoundCount ): format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-get-recordopenstate",
+      "title": "Get ( RecordOpenState )",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/get-recordopenstate.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "Get ( RecordOpenState ): format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-jsongetelement",
+      "title": "JSONGetElement",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/jsongetelement.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "JSONGetElement: format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-jsonsetelement",
+      "title": "JSONSetElement",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/jsonsetelement.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "JSONSetElement: format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-jsonlistkeys",
+      "title": "JSONListKeys",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/jsonlistkeys.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "JSONListKeys: format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-fm19-function-jsonformatelements",
+      "title": "JSONFormatElements",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/jsonformatelements.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "JSONFormatElements: format, return type, originated version, product-specific notes",
+      "retrievedAt": "2026-07-29",
+      "status": "archived"
+    },
+    {
+      "id": "claris-current-error-codes",
+      "title": "FileMaker error codes",
+      "url": "https://help.claris.com/en/pro-help/content/error-codes.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "Current help; code meanings must be checked for 19.5-era applicability",
+      "scope": "Numbered FileMaker, ODBC, SMTP, plug-in, cURL, and REST API errors",
+      "retrievedAt": "2026-07-29",
+      "status": "active",
+      "notes": "Pattern error numbers remain research-candidate mappings; later-version-only codes must not be admitted as 19.5 facts without archived or release-note corroboration."
     }
   ]
 }

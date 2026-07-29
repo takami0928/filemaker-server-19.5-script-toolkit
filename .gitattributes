@@ -1,3 +1,5 @@
 research/issue-7/candidates/*.json text eol=lf
 research/issue-7/candidates/*.md text eol=lf
 catalog/fm19.5/compatibility/*.json text eol=lf
+patterns/**/*.json text eol=lf
+patterns/**/*.md text eol=lf

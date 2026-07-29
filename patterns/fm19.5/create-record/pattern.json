@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "id": "create-record",
+  "title": "Create a record and verify commit",
+  "target": {
+    "fileMakerPro": "19.5",
+    "fileMakerServer": "19.5"
+  },
+  "purpose": "Create one record in an explicit context, set approved fields, verify the commit immediately, and return a JSON result.",
+  "composesPatterns": [
+    "json-parameter-validation"
+  ],
+  "supportedContexts": [
+    "client",
+    "psos",
+    "server_schedule"
+  ],
+  "preconditions": [
+    "Required input is validated before entering the record-creation flow.",
+    "The target layout and table occurrence are resolved and suitable for record creation.",
+    "The account used in the selected execution context has create and field-edit privileges.",
+    "The primary-key generation method is resolved from the target solution; this pattern never invents one.",
+    "Any optional idempotency field and key are both resolved or both omitted."
+  ],
+  "inputContract": {
+    "format": "json",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "payload"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "outputContract": {
+    "schemaRef": "patterns/fm19.5/common-result.schema.json",
+    "successCodes": [
+      "CREATED"
+    ],
+    "errorCodes": [
+      "CREATE_FAILED",
+      "FIELD_ASSIGNMENT_FAILED",
+      "VALIDATION_FAILED",
+      "UNIQUE_CONSTRAINT_FAILED",
+      "PRIVILEGE_DENIED",
+      "COMMIT_FAILED",
+      "DUPLICATE_REQUEST"
+    ]
+  },
+  "placeholders": [
+    {
+      "name": "TARGET_LAYOUT",
+      "kind": "layout",
+      "required": true,
+      "resolutionSource": "target FileMaker solution metadata",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "TARGET_TABLE_OCCURRENCE",
+      "kind": "tableOccurrence",
+      "required": true,
+      "resolutionSource": "the resolved base table occurrence of {{TARGET_LAYOUT}}",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "PRIMARY_KEY_FIELD",
+      "kind": "field",
+      "required": true,
+      "resolutionSource": "target FileMaker solution metadata and data-model contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "GENERATED_PRIMARY_KEY_EXPRESSION",
+      "kind": "calculation",
+      "required": true,
+      "resolutionSource": "the target solution's approved primary-key generation rule",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "FIELD_ASSIGNMENTS",
+      "kind": "fieldMap",
+      "required": true,
+      "resolutionSource": "the validated payload contract and target FileMaker solution metadata",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "IDEMPOTENCY_FIELD",
+      "kind": "field",
+      "required": false,
+      "resolutionSource": "an existing target-solution field approved for idempotency",
+      "unresolvedBehavior": "omit_optional_feature"
+    },
+    {
+      "name": "IDEMPOTENCY_KEY_EXPRESSION",
+      "kind": "calculation",
+      "required": false,
+      "resolutionSource": "the caller's explicit idempotency contract",
+      "unresolvedBehavior": "omit_optional_feature"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Set Error Capture",
+      "purpose": "Keep create, field, commit, and revert failures under script control.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {
+        "psos": "FMSE always behaves as Set Error Capture On; do not depend on an Off state.",
+        "server_schedule": "FMSE always behaves as Set Error Capture On; do not depend on an Off state."
+      }
+    },
+    {
+      "name": "Go to Layout",
+      "purpose": "Establish the create context explicitly.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "Do not use animation; resolve the layout explicitly because client context is not inherited.",
+        "server_schedule": "Do not use animation; resolve the layout explicitly because no client context exists."
+      }
+    },
+    {
+      "name": "New Record/Request",
+      "purpose": "Create exactly one new record in {{TARGET_TABLE_OCCURRENCE}}.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {}
+    },
+    {
+      "name": "Set Field",
+      "purpose": "Set the resolved primary key, approved payload fields, and optional idempotency value.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {}
+    },
+    {
+      "name": "Commit Records/Requests",
+      "purpose": "Commit without a dialog and expose validation, privilege, and uniqueness failures.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "With dialog must be Off; save and validate record data explicitly.",
+        "server_schedule": "With dialog must be Off; save and validate record data explicitly."
+      }
+    },
+    {
+      "name": "Revert Record/Request",
+      "purpose": "Optionally discard the uncommitted record only under a reviewed failure policy.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "With dialog must be Off; reverting discards all uncommitted changes in the current record.",
+        "server_schedule": "With dialog must be Off; reverting discards all uncommitted changes in the current record."
+      }
+    },
+    {
+      "name": "Set Variable",
+      "purpose": "Capture Get ( LastError ) immediately after create, each field assignment, commit, and optional revert.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "If",
+      "purpose": "Branch on creation, assignment, commit, and idempotency outcomes.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Else",
+      "purpose": "Separate successful commit from reviewed failure recovery.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "End If",
+      "purpose": "Close failure-handling branches explicitly.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Exit Script",
+      "purpose": "Return the created primary key or a common error result.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    }
+  ],
+  "functions": [
+    {
+      "name": "Get ( LastError )",
+      "purpose": "Preserve each create, field, commit, and revert result before another step runs.",
+      "sourceIds": [
+        "claris-fm19-function-get-lasterror"
+      ]
+    },
+    {
+      "name": "JSONSetElement",
+      "purpose": "Build the common result with the created primary-key value.",
+      "sourceIds": [
+        "claris-fm19-function-jsonsetelement"
+      ]
+    }
+  ],
+  "happyPath": [
+    "Validate required input before creating a record.",
+    "If {{IDEMPOTENCY_FIELD}} and {{IDEMPOTENCY_KEY_EXPRESSION}} are both resolved, check the approved idempotency rule before creation; otherwise omit that feature explicitly.",
+    "Go to {{TARGET_LAYOUT}} and confirm {{TARGET_TABLE_OCCURRENCE}}.",
+    "Create a new record and immediately capture Get ( LastError ).",
+    "Set {{PRIMARY_KEY_FIELD}} from {{GENERATED_PRIMARY_KEY_EXPRESSION}} and apply {{FIELD_ASSIGNMENTS}}, checking each Set Field result.",
+    "Commit Records/Requests with dialog Off and immediately preserve Get ( LastError ).",
+    "Return CREATED with the resolved primary-key value only after a zero commit error."
+  ],
+  "errorBranches": [
+    {
+      "code": "CREATE_FAILED",
+      "trigger": "New Record/Request returns an error.",
+      "fileMakerCodes": [],
+      "action": "Stop before assigning fields and return the preserved FileMaker code."
+    },
+    {
+      "code": "FIELD_ASSIGNMENT_FAILED",
+      "trigger": "A Set Field step fails.",
+      "fileMakerCodes": [
+        102,
+        201
+      ],
+      "action": "Stop further assignments and apply the reviewed commit/revert policy."
+    },
+    {
+      "code": "PRIVILEGE_DENIED",
+      "trigger": "The account cannot create the record or edit a required field.",
+      "fileMakerCodes": [
+        200,
+        202
+      ],
+      "action": "Return an authorization failure without exposing protected data."
+    },
+    {
+      "code": "VALIDATION_FAILED",
+      "trigger": "Commit fails a field validation or required-value rule.",
+      "fileMakerCodes": [
+        500,
+        501,
+        502,
+        503,
+        505,
+        506,
+        507,
+        509
+      ],
+      "action": "Return a validation result and use Revert only if the reviewed policy permits data loss."
+    },
+    {
+      "code": "UNIQUE_CONSTRAINT_FAILED",
+      "trigger": "Commit reports that a field value is not unique.",
+      "fileMakerCodes": [
+        504
+      ],
+      "action": "Return a deterministic conflict; do not generate a replacement identifier unless the business rule explicitly allows it."
+    },
+    {
+      "code": "COMMIT_FAILED",
+      "trigger": "Commit returns any other nonzero result.",
+      "fileMakerCodes": [],
+      "action": "Preserve the error, report that the record may remain open and uncommitted, and follow the reviewed revert policy."
+    },
+    {
+      "code": "DUPLICATE_REQUEST",
+      "trigger": "The resolved idempotency rule finds that the request was already applied.",
+      "fileMakerCodes": [],
+      "action": "Return the prior logical result or a conflict according to the approved contract; do not create another record."
+    }
+  ],
+  "concurrencyNotes": [
+    "PSOS and scheduled scripts can create records concurrently; a preflight find alone cannot guarantee uniqueness.",
+    "Use an existing unique field or approved idempotency field when the business operation must be exactly-once or retry-safe.",
+    "Do not invent {{IDEMPOTENCY_FIELD}}. If it is absent, document the duplicate-creation risk and omit the optional feature.",
+    "Commit failure can leave the new record open with uncommitted changes; recovery must be explicit."
+  ],
+  "securityNotes": [
+    "Verify create and per-field edit privileges for the account used in every supported context.",
+    "Do not return fields outside the approved result contract.",
+    "Revert Record/Request can discard uncommitted data and must never be an unconditional generic cleanup step.",
+    "Do not log raw sensitive payload values or idempotency secrets."
+  ],
+  "examples": {
+    "inputJson": "{\n  \"schemaVersion\": 1,\n  \"requestId\": \"req-synthetic-003\",\n  \"payload\": {\n    \"displayValue\": \"Synthetic value\"\n  },\n  \"idempotencyKey\": \"idem-synthetic-003\"\n}",
+    "successJson": "{\n  \"ok\": true,\n  \"code\": \"CREATED\",\n  \"message\": \"\",\n  \"data\": {\n    \"primaryKey\": \"synthetic-key-003\"\n  },\n  \"error\": null,\n  \"meta\": {\n    \"pattern\": \"create-record\",\n    \"schemaVersion\": 1\n  }\n}",
+    "failureJson": "{\n  \"ok\": false,\n  \"code\": \"UNIQUE_CONSTRAINT_FAILED\",\n  \"message\": \"A unique value already exists.\",\n  \"data\": null,\n  \"error\": {\n    \"fileMakerCode\": 504,\n    \"step\": \"Commit Records/Requests\",\n    \"details\": \"\"\n  },\n  \"meta\": {\n    \"pattern\": \"create-record\",\n    \"schemaVersion\": 1\n  }\n}"
+  },
+  "sourceIds": [
+    "claris-current-error-codes",
+    "claris-fm19-functions-reference",
+    "claris-fm19-function-get-lasterror",
+    "claris-fm19-function-jsonsetelement",
+    "claris-fm19-running-scripts-on-server",
+    "claris-fm19-script-steps-reference",
+    "claris-fm19-step-commit-records-requests",
+    "claris-fm19-step-else",
+    "claris-fm19-step-end-if",
+    "claris-fm19-step-exit-script",
+    "claris-fm19-step-go-to-layout",
+    "claris-fm19-step-if-script-step",
+    "claris-fm19-step-new-record-request",
+    "claris-fm19-step-revert-record-request",
+    "claris-fm19-step-set-error-capture",
+    "claris-fm19-step-set-field",
+    "claris-fm19-step-set-variable"
+  ],
+  "verificationStatus": "design_only"
+}
