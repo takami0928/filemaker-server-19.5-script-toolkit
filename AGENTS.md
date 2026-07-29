@@ -84,12 +84,17 @@ fms19 lint generated-v2.xml
 
 ## Completion reporting
 
-Report these states separately:
+Use the repository-wide reporting format and legacy-label mappings in
+[`docs/EVIDENCE_MODEL.md`](docs/EVIDENCE_MODEL.md#repository-wide-completion-reporting).
+Report every dimension separately:
 
-- design ready
-- XML generated and automated checks passed
-- FileMaker Pro 19.5 paste verified
-- FileMaker Pro 19.5 runtime verified
-- FileMaker Server 19.5 FMSE verified
+- Design status: `draft_design` or `implementation_ready`
+- XML output: `not_requested`, `not_generated`, or `generated`
+- Automated checks: `not_run`, `passed`, or `failed`
+- FileMaker Pro 19.5 paste verification: `not_run`, `passed`, or `failed`
+- FileMaker Pro 19.5 client runtime verification: `not_run`, `passed`, or `failed`
+- FileMaker Server 19.5 FMSE verification: `not_run`, `passed`, or `failed`
 
-Never describe an earlier state as a later one.
+Do not omit `not_run`. Do not infer one dimension from another. If the frozen
+legacy labels `design_ready` or `xml_generated` are used, follow their narrower
+meanings and mappings in the evidence model.

@@ -38,7 +38,11 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 - Evidence levels are monotonic and cannot skip required proof.
 - Automated tests cannot claim FileMaker paste, runtime, or FMSE verification.
 - Script IR input cannot self-assert XML generation or FileMaker verification.
-- Documentation distinguishes design-ready, XML-generated, paste-verified, runtime-verified, and FMSE-verified states.
+- Documentation distinguishes `draft_design` from `implementation_ready`.
+- XML output and automated-check results are reported as separate dimensions.
+- FileMaker Pro 19.5 paste, FileMaker Pro 19.5 client runtime, and FileMaker Server 19.5 FMSE results are reported separately, including explicit `not_run` states.
+- Legacy `design_ready` and `xml_generated` labels follow the mappings in `docs/EVIDENCE_MODEL.md`; they do not replace the repository-wide report.
+- CI success cannot set paste, client runtime, or FMSE verification to `passed`.
 
 ## G4 — XML and catalog integrity
 

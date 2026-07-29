@@ -44,19 +44,27 @@
 
 ## 設計状態と停止条件
 
-### `draft design`
+設計状態とXML／実機検証の処理結果は、[証拠モデルの正規報告形式](docs/EVIDENCE_MODEL.md#repository-wide-completion-reporting)に従って別々に報告します。
+
+### `draft_design`
 
 確認済み情報だけで作成できる範囲を設計します。仮定と不足情報を分離し、未解決箇所、選択肢、確認質問を明示します。
 
 不足情報があっても設計全体を無条件に止める必要はありません。ただし、不明なオブジェクト名、内部ID、権限、業務仕様、入力値を推測で埋めてはいけません。
 
-### `implementation-ready design`
+未解決の必須情報があれば、設計状態は`draft_design`のままとします。
 
-FileMaker担当者がScript Workspaceへ手作業で実装できるだけの情報が揃った設計です。
+### `implementation_ready`
 
-少なくとも、必須オブジェクト、権限、実行コンテキスト、呼出元、入力契約、結果契約、各ステップの設定、エラー分岐が解決済みでなければ、`implementation-ready`と表現してはいけません。互換性の`partial`条件や`unknown`も解消が必要です。
+FileMaker担当者がScript Workspaceへ手作業で実装できるだけの情報が揃い、採用する機能の範囲が確定した設計です。
 
-`implementation-ready`は、XML生成、FileMakerへの貼り付け、runtime、FMSEの検証状態を意味しません。
+少なくとも、採用した設計に必要なオブジェクト、権限、実行コンテキスト、呼出元、入力契約、結果契約、各ステップの設定、エラー分岐が解決済みでなければ、`implementation_ready`と表現してはいけません。採用したステップに関係する互換性の`partial`条件や`unknown`も解消が必要です。
+
+optional情報は、採用する機能に必要な場合だけ必須になります。optionalなidempotency field、version field、補助レイアウト等を確認できない場合は、その機能を明示的に採用しない設計にできます。その場合は、省略した機能、設計への影響、将来追加するときの確認事項を記録します。採用すると宣言した機能に必要な情報を、後からoptional扱いへ戻してはいけません。
+
+非blockingな確認事項が残っていても、手作業実装に必要な情報が揃い、採用範囲が確定していれば`implementation_ready`を妨げません。
+
+`implementation_ready`は、XML生成、FileMakerへの貼り付け、runtime、FMSEの検証状態を意味しません。
 
 ## 必須出力
 
@@ -119,6 +127,19 @@ XMLは、別途明示された依頼と再承認がある場合だけ扱う凍�
 - XML生成、構造検査、FileMaker Pro 19.5貼り付け、client runtime、FMSE runtimeを別の状態として報告する。
 - FileMaker Pro／Server 19.5実機未検証XMLを、正しいXML、検証済み成果物、正式成果物と表現しない。
 
+XMLを依頼された場合は、少なくとも次を別々に報告します。
+
+```text
+Design status: draft_design | implementation_ready
+XML output: not_requested | not_generated | generated
+Automated checks: not_run | passed | failed
+Paste verification: not_run | passed | failed
+Client runtime verification: not_run | passed | failed
+FMSE verification: not_run | passed | failed
+```
+
+XMLを依頼されていない場合も、`XML output: not_requested`と明示できます。`not_run`を省略してはいけません。
+
 ## 設計優先順位
 
 1. データを壊さない
@@ -138,6 +159,6 @@ XMLは、別途明示された依頼と再承認がある場合だけ扱う凍�
 - `With dialog: On`を前提にしたサーバー処理
 - エラー取得前に別のステップを実行すること
 - 対象を限定しない削除、全置換、一括更新
-- 未解決情報がある設計を`implementation-ready`と表現すること
+- 未解決の必須情報がある設計を`implementation_ready`と表現すること
 - 「設計済み」「XML生成済み」「実機検証済み」を同じ状態として扱うこと
 - `design_only`パターンをXML生成可能または実機検証済みと表現すること

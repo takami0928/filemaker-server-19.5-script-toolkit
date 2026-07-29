@@ -48,6 +48,8 @@ Exit condition: the public Markdown gives Copilot enough bounded guidance to pro
 
 ## Following — SharePoint package and pilot
 
+Tracking: #15.
+
 After the knowledge documents are reviewed:
 
 - Build a distribution package containing only `docs/copilot/`.
