@@ -37,3 +37,10 @@ where = ["src"]
   "schemas/script-ir-v2.schema.json",
   "schemas/script-ir.schema.json",
 ]
+"share/fms19-script-toolkit/catalog/fm19.5" = [
+  "catalog/fm19.5/verified-steps.json",
+]
+"share/fms19-script-toolkit/catalog/fm19.5/compatibility" = [
+  "catalog/fm19.5/compatibility/script-steps.json",
+  "catalog/fm19.5/compatibility/sources.json",
+]

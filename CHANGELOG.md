@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Issue #7のresearch candidate全59ステップと参照出典64件を、FileMaker 19.5互換性参照カタログへ決定的に正規化
+- `fms19 compat`と`fms19 list-steps`を追加し、7実行コンテキスト、4互換性状態、カテゴリ、renderer状態を検索・絞り込み可能に変更
+- renderer状態をverified catalogとFileMaker証拠から算出し、互換性、XML生成対応、実機検証を分離
+- 正規化差分、出典、後続版遡及、unknown／partial、renderer証拠を検査する品質ゲートとinstalled-wheel smoke testを追加
 - 厳格なScript IR v2とDraft 2020-12 JSON Schemaを追加
 - 対象バージョン、実行環境、JSON契約、コンテキスト、変数、オブジェクト参照、リスク、設計・証拠状態を明示
 - 7種類の既存ステップを`additionalProperties: false`のdiscriminated unionへ変更

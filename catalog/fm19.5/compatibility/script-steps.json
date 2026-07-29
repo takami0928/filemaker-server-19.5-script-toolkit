@@ -1,0 +1,2748 @@
+{
+  "schemaVersion": 1,
+  "target": {
+    "proVersion": "19.5",
+    "serverVersion": "19.5"
+  },
+  "classification": "compatibility-reference",
+  "derivedFrom": {
+    "classification": "research-candidate",
+    "scriptSteps": "research/issue-7/candidates/script-step-catalog-candidates.json"
+  },
+  "scope": {
+    "normalization": "all research candidate script steps",
+    "stepCount": 59
+  },
+  "policy": {
+    "unknown": "fail-closed",
+    "partial": "requires documented conditions or constraints",
+    "laterServerSupport": "must not be backported to 19.5",
+    "rendererStatus": "derived from catalog/fm19.5/verified-steps.json"
+  },
+  "contexts": [
+    "client",
+    "psos",
+    "server_schedule",
+    "webdirect",
+    "filemaker_go",
+    "data_api",
+    "custom_web_publishing"
+  ],
+  "supportValues": [
+    "available",
+    "unavailable",
+    "partial",
+    "unknown"
+  ],
+  "steps": [
+    {
+      "name": "Allow User Abort",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "On",
+          "effect": "Permits user abort in interactive clients; in FMSE, affects whether an unknown step (error 4) terminates the script.",
+          "executionNotes": "No client user can directly cancel a PSOS server session."
+        },
+        {
+          "option": "Off",
+          "effect": "Suppresses interactive user abort and allows FMSE to continue after an unknown step, subject to documented behavior."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Do not use this as a substitute for explicit error handling or administrator timeout."
+      ],
+      "commonErrors": [
+        4
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-allow-user-abort",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Else",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-else",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Else If",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-else-if",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "End If",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-end-if",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "End Loop",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-end-loop",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Exit Loop If",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-exit-loop-if",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Exit Script",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-exit-script",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Halt Script",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-halt-script",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "If",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-if-script-step",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Loop",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-loop",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Pause/Resume Script",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "Indefinitely",
+          "effect": "The FMSE session can remain paused until resumed, timed out, or stopped; unsuitable for unattended automation."
+        },
+        {
+          "option": "For duration",
+          "effect": "Consumes a server script session during the pause."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Do not use interactive pause as a server orchestration primitive.",
+        "Can exhaust script-session capacity or trigger schedule timeout."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-pause-resume-script",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Perform Script",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [
+        "Runs in the same session and therefore shares the caller's FMSE context and variables according to normal script scoping."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Local variables in the caller are not a substitute for an explicit subscript parameter contract."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-perform-script",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Perform Script on Server",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "13.0",
+      "serverSupportIntroducedIn": "13.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "Wait for completion: On",
+          "effect": "Caller waits and can receive script result and server-side error."
+        },
+        {
+          "option": "Wait for completion: Off",
+          "effect": "Asynchronous; no dependable result handoff to the initiating script."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [
+        "Creates a separate FMSE session; it does not inherit client layout, found set, sort order, current record, variables, or global-field values."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Requires explicit JSON parameter/context reconstruction.",
+        "Nested PSOS creates another independent session.",
+        "Design for idempotency, record locking, path collisions, queueing, and concurrent execution."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-perform-script-on-server",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Set Error Capture",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "On/Off",
+          "effect": "Server-side, Data API, and CWP scripts always behave as On."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Read Get ( LastError ) immediately after the step being checked; some control steps preserve an earlier error."
+      ],
+      "commonErrors": [
+        3,
+        4
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-set-error-capture",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Set Error Logging",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "20.1.1",
+      "execution": {
+        "client": "available",
+        "psos": "unavailable",
+        "server_schedule": "unavailable",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "",
+      "risks": [
+        "The step exists in FileMaker Pro 19.5 but is unavailable in PSOS and server schedules. Do not confuse step introduction with server-support introduction."
+      ],
+      "commonErrors": [
+        3
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-set-error-logging",
+        "claris-server-release-notes-20-1-1"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": [
+        {
+          "fromVersion": "20.1.1",
+          "change": "FileMaker Server gained support for Set Error Logging in FMSE.",
+          "sourceIds": [
+            "claris-server-release-notes-20-1-1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Set Variable",
+      "category": "control",
+      "availableIn19_5": true,
+      "introducedIn": "8.0",
+      "serverSupportIntroducedIn": "8.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-set-variable",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Close Data File",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-close-data-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Create Data File",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-create-data-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Delete File",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-delete-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Get File Exists",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-get-file-exists",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Open Data File",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-open-data-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Read from Data File",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths.",
+        "Maximum documented read per invocation is 64 MB; smaller chunks are recommended for performance."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-read-from-data-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Write to Data File",
+      "category": "data-file",
+      "availableIn19_5": true,
+      "introducedIn": "18.0",
+      "serverSupportIntroducedIn": "18.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "unavailable",
+        "filemaker_go": "available",
+        "data_api": "unavailable",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use a FileMaker-format path permitted to the executing product; FMSE is limited to Documents/Temporary and child folders."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Track file IDs within one session; they are not portable across PSOS/schedule sessions.",
+        "Close handles on all exit paths.",
+        "Default text encoding is UTF-16 little-endian unless UTF-8 is selected."
+      ],
+      "commonErrors": [
+        100,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-write-to-data-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Execute FileMaker Data API",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "19.0",
+      "serverSupportIntroducedIn": "19.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "action=read",
+          "effect": "Documented in the FileMaker 19 archive."
+        },
+        {
+          "option": "action=metaData",
+          "effect": "Documented in the FileMaker 19 archive."
+        },
+        {
+          "option": "action=create/update/delete/duplicate",
+          "effect": "Not admitted for 19.5; later help/release notes expanded the step."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Inspect result.messages; do not rely only on Get ( LastError ) for request-level errors.",
+        "The step runs in a hidden-window context."
+      ],
+      "commonErrors": [
+        1700,
+        1701,
+        1702,
+        1703,
+        1704,
+        1705,
+        1706,
+        1707,
+        1708,
+        1709,
+        1710
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-execute-filemaker-data-api",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Execute SQL",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "12.0",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "unavailable",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Server uses server-side ODBC DSNs/drivers.",
+        "FileMaker Server 19 requires compatible 64-bit ODBC drivers.",
+        "Persist detailed external errors."
+      ],
+      "commonErrors": [
+        1400,
+        1401,
+        1404,
+        1407,
+        1408,
+        1409,
+        1413,
+        1414
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-execute-sql",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Export Field Contents",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "unavailable",
+        "server_schedule": "unavailable",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions.",
+        "FileMaker Server 19.5 compatibility is No; the step is skipped with error 3.",
+        "Later server support must not be backported into this catalog."
+      ],
+      "commonErrors": [
+        3
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-export-field-contents",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths",
+        "claris-pro-release-notes"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": [
+        {
+          "fromVersion": "26.0.1",
+          "change": "Later FileMaker Server release notes report server-side support; this is outside 19.5.",
+          "sourceIds": [
+            "claris-pro-release-notes"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Export Records",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions."
+      ],
+      "commonErrors": [
+        410,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-export-records",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Import Records",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        },
+        {
+          "option": "Import to new table",
+          "effect": "Unsupported in server-side scripts."
+        },
+        {
+          "option": "Folder import",
+          "effect": "Unsupported in server-side scripts."
+        },
+        {
+          "option": "Import images into container",
+          "effect": "Unsupported in server-side scripts."
+        }
+      ],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions."
+      ],
+      "commonErrors": [
+        100,
+        102,
+        409,
+        413,
+        800,
+        802,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-import-records",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Insert File",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "unavailable",
+        "server_schedule": "unavailable",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions.",
+        "FileMaker Server 19.5 compatibility is No; use Import Records/container workflows, Insert from URL, or data-file steps as appropriate."
+      ],
+      "commonErrors": [
+        3
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-insert-file",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Insert from URL",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "12.0",
+      "serverSupportIntroducedIn": "12.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Capture Get ( LastExternalErrorDetail ) immediately.",
+        "Set explicit timeouts and validate TLS."
+      ],
+      "commonErrors": [
+        100,
+        1630,
+        1631,
+        1632,
+        1633,
+        1634
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-insert-from-url",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Save Records as Excel",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "8.0",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "unavailable",
+        "server_schedule": "unavailable",
+        "webdirect": "unavailable",
+        "filemaker_go": "unavailable",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions.",
+        "FileMaker Server 19.5 compatibility is No. Use Export Records to a supported format or data-file steps."
+      ],
+      "commonErrors": [
+        3
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-save-records-as-excel",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Save Records as PDF",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "8.0",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        },
+        {
+          "option": "Automatically open file",
+          "effect": "Unsupported in FMSE."
+        },
+        {
+          "option": "Create email with file as attachment",
+          "effect": "Unsupported in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions.",
+        "Requires printing privilege or a script configured for full access.",
+        "FileMaker Data API support was added later and is false for 19.5."
+      ],
+      "commonErrors": [
+        3,
+        9,
+        200,
+        203,
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-save-records-as-pdf",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths",
+        "claris-server-release-notes-20-1-1"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": [
+        {
+          "fromVersion": "20.1.1",
+          "change": "Save Records as PDF became supported for scripts run by FileMaker Data API.",
+          "sourceIds": [
+            "claris-server-release-notes-20-1-1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Save Records as Snapshot Link",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "11.0",
+      "serverSupportIntroducedIn": "11.0",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "unavailable",
+        "custom_web_publishing": "unavailable"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Use only server-accessible Documents/Temporary paths where the step is server-compatible."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Reject paths containing '..'; avoid ambiguous relative paths and concurrent filename collisions.",
+        "The snapshot references hosted file state and access privileges; it is not a durable data export."
+      ],
+      "commonErrors": [
+        800,
+        802,
+        809,
+        810,
+        826
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-save-records-as-snapshot-link",
+        "claris-fm19-running-scripts-on-server",
+        "claris-fm19-server-side-paths"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Send Mail",
+      "category": "external-io",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "Send via email client",
+          "effect": "Unavailable to FMSE."
+        },
+        {
+          "option": "Send via SMTP server",
+          "effect": "Use for FMSE and validate credentials/TLS."
+        },
+        {
+          "option": "With dialog",
+          "effect": "Unavailable to FMSE."
+        }
+      ],
+      "contextRequirements": [],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [
+        1501,
+        1502,
+        1503,
+        1504,
+        1505,
+        1506,
+        1507
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-send-mail",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Constrain Found Set",
+      "category": "find",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Treat error 401 as an explicit zero-result outcome, not automatically as an infrastructure failure."
+      ],
+      "commonErrors": [
+        400,
+        401,
+        508
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-constrain-found-set",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Extend Found Set",
+      "category": "find",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Treat error 401 as an explicit zero-result outcome, not automatically as an infrastructure failure."
+      ],
+      "commonErrors": [
+        400,
+        401,
+        508
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-extend-found-set",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Modify Last Find",
+      "category": "find",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Treat error 401 as an explicit zero-result outcome, not automatically as an infrastructure failure."
+      ],
+      "commonErrors": [
+        400,
+        401,
+        508
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-modify-last-find",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Perform Find",
+      "category": "find",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Treat error 401 as an explicit zero-result outcome, not automatically as an infrastructure failure."
+      ],
+      "commonErrors": [
+        400,
+        401,
+        508
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-perform-find",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Set Field",
+      "category": "find-record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [
+        5,
+        102,
+        200,
+        201,
+        202,
+        509,
+        511
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-set-field",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Close Window",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-close-window",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Enter Browse Mode",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "Pause",
+          "effect": "Interactive pausing is unsafe for FMSE; use Pause: Off."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "A server-compatible step may still have unsupported animation, pause, dialog, window, or calculation options."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-enter-browse-mode",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Enter Find Mode",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "Pause",
+          "effect": "Interactive pausing is unsafe for FMSE; use Pause: Off."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "A server-compatible step may still have unsupported animation, pause, dialog, window, or calculation options."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-enter-find-mode",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Go to Layout",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "Animation",
+          "effect": "Not meaningful or unsupported in server-side execution."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "A server-compatible step may still have unsupported animation, pause, dialog, window, or calculation options."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-go-to-layout",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Go to Record/Request/Page",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "By calculation",
+          "effect": "Compatibility is narrower in server/web publishing contexts; avoid unless explicitly documented and tested for 19.5."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "A server-compatible step may still have unsupported animation, pause, dialog, window, or calculation options."
+      ],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-go-to-record-request-page",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Go to Related Record",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "partial",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "partial",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "A server-compatible step may still have unsupported animation, pause, dialog, window, or calculation options.",
+        "Requires a valid related record from the current FMSE context.",
+        "External-file relationship access may prompt/re-authenticate and must be tested."
+      ],
+      "commonErrors": [
+        101,
+        103,
+        114,
+        200
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-go-to-related-record",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "New Window",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "partial",
+        "filemaker_go": "partial",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-new-window",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Omit Record",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-omit-record",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Select Window",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-select-window",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Show All Records",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-show-all-records",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Sort Records",
+      "category": "layout-context",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off for FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "A server-compatible step may still have unsupported animation, pause, dialog, window, or calculation options."
+      ],
+      "commonErrors": [
+        204,
+        404
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-sort-records",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Commit Records/Requests",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off or is unavailable in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [
+        200,
+        201,
+        301,
+        302,
+        306,
+        500,
+        501,
+        502,
+        503,
+        504,
+        505,
+        506,
+        507,
+        509,
+        512
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-commit-records-requests",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Delete All Records",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Destructive or bulk operation; require explicit privilege, found-set, and idempotency guards."
+      ],
+      "commonErrors": [
+        9,
+        101,
+        200,
+        301,
+        401,
+        509
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-delete-all-records",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Delete Record/Request",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Destructive or bulk operation; require explicit privilege, found-set, and idempotency guards."
+      ],
+      "commonErrors": [
+        9,
+        101,
+        200,
+        301,
+        401,
+        509
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-delete-record-request",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Duplicate Record/Request",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-duplicate-record-request",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "New Record/Request",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-new-record-request",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Open Record/Request",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": "6.0 or earlier",
+      "execution": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "available",
+        "custom_web_publishing": "available"
+      },
+      "summary": "",
+      "options": [],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-open-record-request",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Relookup Field Contents",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Destructive or bulk operation; require explicit privilege, found-set, and idempotency guards."
+      ],
+      "commonErrors": [
+        9,
+        101,
+        200,
+        301,
+        401,
+        509
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-relookup-field-contents",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Replace Field Contents",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [
+        "Destructive or bulk operation; require explicit privilege, found-set, and idempotency guards."
+      ],
+      "commonErrors": [
+        9,
+        101,
+        200,
+        301,
+        401,
+        509
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-replace-field-contents",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    },
+    {
+      "name": "Revert Record/Request",
+      "category": "record",
+      "availableIn19_5": true,
+      "introducedIn": "6.0 or earlier",
+      "serverSupportIntroducedIn": null,
+      "execution": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial",
+        "webdirect": "available",
+        "filemaker_go": "available",
+        "data_api": "partial",
+        "custom_web_publishing": "partial"
+      },
+      "summary": "",
+      "options": [
+        {
+          "option": "With dialog",
+          "effect": "Must be Off or is unavailable in FMSE."
+        }
+      ],
+      "contextRequirements": [
+        "Explicit FMSE layout/table-occurrence context; client context is not inherited."
+      ],
+      "contextEffects": [
+        "May change the independent FMSE session's layout, mode, current record, found set, or sort order."
+      ],
+      "dialogBehavior": "FMSE has no interactive user. Dialog-dependent options must be Off or are ignored/unsupported.",
+      "risks": [],
+      "commonErrors": [
+        200,
+        201,
+        301,
+        302,
+        306,
+        500,
+        501,
+        502,
+        503,
+        504,
+        505,
+        506,
+        507,
+        509,
+        512
+      ],
+      "sourceIds": [
+        "claris-fm19-script-steps-reference",
+        "claris-fm19-step-revert-record-request",
+        "claris-fm19-running-scripts-on-server"
+      ],
+      "confidence": "high",
+      "researchStatus": "documented",
+      "researchEvidence": [
+        "documented"
+      ],
+      "compatibilityBasis": "archived-fm19-step-page",
+      "versionTransitions": []
+    }
+  ]
+}

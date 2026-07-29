@@ -15,6 +15,10 @@
 - 未解決オブジェクト参照が残る場合のXML生成拒否
 - IR入力によるXML生成・FileMaker実機証拠の自己申告拒否
 - wheelを空の仮想環境へインストールし、同梱スキーマで行うIR検証・移行
+- Issue #7の全59スクリプトステップと参照出典64件の決定的な互換性カタログ正規化
+- 7実行コンテキスト、4互換性値、partial条件、後続版遡及、source参照、renderer証拠境界の検査
+- `compat`／`list-steps`の完全一致、候補、絞り込み、決定的JSON出力
+- wheelを空の仮想環境へインストールし、同梱カタログを使う互換性CLI
 - Windows用長さプレフィックス付きUTF-8ペイロードのencode/decode往復
 - 出典レジストリの必須項目、ID、URL、日付、重複
 - ステップカタログの出典IDと証拠レベル
@@ -24,7 +28,7 @@
 
 これらは`structure_tested`または`clipboard_payload_tested`に相当する自動証拠です。FileMaker Pro／Serverによる実行証拠ではありません。
 
-IR検証、移行、レンダリング、XML lintはWindowsとLinuxのCIで同じコードパスを検査する。Python 3.13の両OS構成ではwheel配布形態も検査する。Win32クリップボードAPIの実機操作はWindows上の手動検証として分離する。
+IR検証、移行、レンダリング、XML lint、互換性CLIはWindowsとLinuxのCIで同じコードパスを検査する。Python 3.13の両OS構成ではwheel配布形態も検査する。Win32クリップボードAPIの実機操作はWindows上の手動検証として分離する。
 
 ## 実機検証が必要
 

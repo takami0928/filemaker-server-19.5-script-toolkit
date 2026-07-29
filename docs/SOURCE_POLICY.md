@@ -26,7 +26,9 @@ Secondary sources may establish `public_fixture_observed` or identify questions 
 
 ## Recording sources
 
-`sources/registry.json` is the canonical registry. Each entry includes:
+`sources/registry.json` is the canonical registry for implementation and XML claims. The normalized compatibility reference uses the dedicated `catalog/fm19.5/compatibility/sources.json` registry because it preserves the complete Issue #7 candidate records selected by the 59 script steps. Repository policy verifies that this dedicated registry is an exact, non-promoted subset of the research source candidates.
+
+Each source entry includes:
 
 - stable ID
 - title and URL
@@ -52,7 +54,7 @@ A claim affecting generated XML, server compatibility, data safety, or evidence 
 
 ## Research artifacts
 
-Deep Research and exploratory notes belong under a future `research/` area and are not normative. A separate review must extract accepted claims into the source registry, catalogs, and documentation.
+Deep Research and exploratory notes under `research/` are not normative. A separate review must extract accepted claims into a registered source subset, catalog, and documentation without promoting research evidence. The compatibility catalog is a documented reference normalization; it is not the verified renderer catalog and does not establish FileMaker device evidence.
 
 ## Copyright
 

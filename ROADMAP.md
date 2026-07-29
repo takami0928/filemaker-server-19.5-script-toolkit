@@ -72,10 +72,14 @@ Exit condition: repository changes can be shown to improve or preserve AI output
 
 Tracking: #7. Blocked by Phase 0. Requires a focused Deep Research pass.
 
-- Script steps and execution compatibility
+- [x] Phase A: normalize all 59 researched script steps and their execution compatibility
+- [x] Phase A: add deterministic `compat` and `list-steps` reference CLI
+- [x] Phase A: keep compatibility, renderer implementation, and FileMaker evidence separate
 - Important functions, errors, paths, PSOS, schedules, import/export, ODBC, and plug-ins
 - Source IDs, confidence, evidence, and unknown/fail-closed states
 - Generated human/AI-readable documentation
+
+Phase A does not complete Phase 5: functions, errors, environment guidance, unresolved research, fixtures, and practical server-script patterns remain.
 
 Exit condition: high-priority server-side design decisions can be made without ad hoc web research.
 

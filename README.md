@@ -11,6 +11,7 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 - FileMaker Server 19.5向けのスクリプト作法
 - クライアント実行とFileMaker Script Engine（FMSE）実行の境界
 - 19.5を対象とした互換性・禁止事項の管理方法
+- 全59ステップの正規化互換性カタログと検索・一覧CLI
 - `fmxmlsnippet`の構造検査
 - WindowsのFileMaker専用クリップボード形式への読み書き
 - 厳格なScript IR v2、v1からの決定的移行、JSON Schema検証
@@ -54,7 +55,7 @@ FileMaker Server 19.5 にホストされたカスタム App を、AIと人間が
 5. 貼り付け後はFileMaker Proの問題表示、参照先、互換性表示を確認する。
 6. 「XMLを生成できた」と「実環境で動作した」を区別する。
 7. CI成功をFileMaker実機証拠として扱わない。
-8. 互換性・動作上の主張は`sources/registry.json`の出典IDへ紐づける。
+8. 互換性・動作上の主張は登録済み出典IDへ紐づける。正規化互換性カタログは専用の`catalog/fm19.5/compatibility/sources.json`を使い、その他は`sources/registry.json`を使う。
 
 ## クイックスタート
 
@@ -65,6 +66,15 @@ python -m pip install -e .
 
 # リポジトリ品質ゲート
 python scripts/check_repository.py
+
+# FileMaker 19.5互換性を検索
+fms19 compat "Perform Script on Server" --context psos
+fms19 compat "Insert File" --context server_schedule
+
+# 互換性カタログを絞り込み
+fms19 list-steps --context psos --support available
+fms19 list-steps --category control
+fms19 list-steps --renderer-status experimental
 
 # XML検査
 fms19 lint examples/server-script-steps.xml
@@ -92,6 +102,18 @@ fms19 clipboard-read captured.xml
 ```
 
 FileMaker Pro 19.5でホストファイルを開き、スクリプトワークスペースの挿入位置で貼り付けます。
+
+## FileMaker 19.5互換性CLI
+
+`catalog/fm19.5/compatibility/`には、Issue #7のresearch candidate全59ステップと、それらが参照する64出典を実用参照用に正規化して保存しています。
+
+`fms19 compat <step-name>`はFileMaker Pro 19.5での存在、導入版、Server対応導入版、7つの実行コンテキスト、条件・リスク、出典、renderer状態を表示します。名前は大文字小文字を区別せず完全一致を優先し、完全一致しない場合は候補を表示するだけで自動選択しません。
+
+`fms19 list-steps`はcontext、support、category、renderer statusで絞り込めます。`available`、`unavailable`、`partial`、`unknown`は別状態で、`partial`と`unknown`を利用可能として扱いません。`--json`は決定的な機械可読出力です。
+
+互換性カタログは公開資料に基づく参照で、`catalog/fm19.5/verified-steps.json`のXML renderer／fixture証拠とは別です。renderer statusは後者から実行時に算出し、FileMaker Pro 19.5貼り付け証拠のない実装を`verified`にしません。このPhase AではXML renderer、Script IR、fixtureを拡張していません。
+
+詳細は[FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)、設計判断は[ADR 0003](decisions/0003-normalize-compatibility-catalog-and-cli.md)を参照してください。
 
 ## 現在のレンダラー対応ステップ
 
@@ -140,6 +162,7 @@ Win32クリップボードAPIを使う`clipboard-read`、`clipboard-write`、`cl
 - [AI利用契約](AI_GUIDE.md)
 - [FileMaker Server 19.5実行境界](docs/FM_SERVER_19_5.md)
 - [Script IR](docs/SCRIPT_IR.md)
+- [FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)
 - [スクリプト作法](docs/SCRIPT_STYLE.md)
 - [サーバー実行設計](docs/SERVER_EXECUTION.md)
 - [XML・クリップボード](docs/XML_CLIPBOARD.md)

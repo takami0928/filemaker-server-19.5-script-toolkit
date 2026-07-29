@@ -23,6 +23,10 @@ jobs:
       - run: python scripts/check_repository.py
       - run: python -m fms19_toolkit.research_policy .
       - run: python -m unittest discover -s tests -v
+      - name: Smoke-test compatibility CLI
+        run: |
+          fms19 compat "Perform Script on Server" --context psos --json
+          fms19 list-steps --context server_schedule --support unavailable
       - run: fms19 validate-ir examples/server-script-ir-v2.json
       - run: fms19 migrate-ir examples/server-script-ir.json "${{ runner.temp }}/migrated-ir-v2.json"
       - run: fms19 validate-ir "${{ runner.temp }}/migrated-ir-v2.json"
