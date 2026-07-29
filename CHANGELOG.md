@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- FileMaker Server 19.5向けに、JSON引数検証、主キー1件検索、レコード作成、レコード更新、同期PSOSの5つの実用設計パターンを追加
+- 必須プレースホルダーを`block_generation`とし、レイアウト、TO、フィールド、スクリプト、内部IDの推測による完成扱いを禁止
+- パターンのステップ、context別互換性、`partial`条件、関数、出典、renderer状態、JSON例、後続版混入、実機証拠自己申告を検査するrepository policyと単体テストを追加
+- 全パターンを`design_only`に固定し、XML renderer、Script IR、verified catalog、FileMaker実機証拠を変更しないPhase B境界を文書化
 - Issue #7のresearch candidate全59ステップと参照出典64件を、FileMaker 19.5互換性参照カタログへ決定的に正規化
 - `fms19 compat`と`fms19 list-steps`を追加し、7実行コンテキスト、4互換性状態、カテゴリ、renderer状態を検索・絞り込み可能に変更
 - renderer状態をverified catalogとFileMaker証拠から算出し、互換性、XML生成対応、実機検証を分離

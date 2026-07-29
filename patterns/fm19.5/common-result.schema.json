@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/fms19/pattern-result-v1.schema.json",
+  "title": "Common FileMaker script pattern result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "code",
+    "message",
+    "data",
+    "error",
+    "meta"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "message": {
+      "type": "string"
+    },
+    "data": {
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    },
+    "error": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fileMakerCode",
+            "step",
+            "details"
+          ],
+          "properties": {
+            "fileMakerCode": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "step": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "schemaVersion"
+      ],
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "enum": [
+            "create-record",
+            "find-one-by-primary-key",
+            "json-parameter-validation",
+            "perform-script-on-server",
+            "update-record"
+          ]
+        },
+        "schemaVersion": {
+          "const": 1
+        }
+      }
+    }
+  }
+}

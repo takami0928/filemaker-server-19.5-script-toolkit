@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 1,
+  "id": "update-record",
+  "title": "Update a record and verify commit",
+  "target": {
+    "fileMakerPro": "19.5",
+    "fileMakerServer": "19.5"
+  },
+  "purpose": "Find exactly one record by primary key, confirm that it can be edited, apply an explicit partial update, and verify the commit result.",
+  "composesPatterns": [
+    "json-parameter-validation",
+    "find-one-by-primary-key"
+  ],
+  "supportedContexts": [
+    "client",
+    "psos",
+    "server_schedule"
+  ],
+  "preconditions": [
+    "The json-parameter-validation and find-one-by-primary-key pattern preconditions are satisfied.",
+    "The approved update contract distinguishes an omitted property from an explicit empty string.",
+    "Every field assignment and any before/after field map is resolved from target-solution metadata.",
+    "The account used in the selected execution context has read and edit privileges.",
+    "Any optional version field and expected value are both resolved or both omitted."
+  ],
+  "inputContract": {
+    "format": "json",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "primaryKey",
+        "changes"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primaryKey": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "changes": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "expectedVersion": {
+          "type": [
+            "string",
+            "number"
+          ]
+        }
+      }
+    }
+  },
+  "outputContract": {
+    "schemaRef": "patterns/fm19.5/common-result.schema.json",
+    "successCodes": [
+      "UPDATED"
+    ],
+    "errorCodes": [
+      "RECORD_NOT_FOUND",
+      "PRIMARY_KEY_NOT_UNIQUE",
+      "RECORD_LOCKED",
+      "OPTIMISTIC_LOCK_CONFLICT",
+      "FIELD_ASSIGNMENT_FAILED",
+      "VALIDATION_FAILED",
+      "PRIVILEGE_DENIED",
+      "COMMIT_CONFLICT",
+      "COMMIT_FAILED"
+    ]
+  },
+  "placeholders": [
+    {
+      "name": "TARGET_LAYOUT",
+      "kind": "layout",
+      "required": true,
+      "resolutionSource": "target FileMaker solution metadata",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "TARGET_TABLE_OCCURRENCE",
+      "kind": "tableOccurrence",
+      "required": true,
+      "resolutionSource": "the resolved base table occurrence of {{TARGET_LAYOUT}}",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "PRIMARY_KEY_FIELD",
+      "kind": "field",
+      "required": true,
+      "resolutionSource": "target FileMaker solution metadata and data-model contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "PRIMARY_KEY_VALUE_EXPRESSION",
+      "kind": "calculation",
+      "required": true,
+      "resolutionSource": "the validated input contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "FIELD_ASSIGNMENTS",
+      "kind": "fieldMap",
+      "required": true,
+      "resolutionSource": "the approved partial-update contract and target FileMaker solution metadata",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "OUTPUT_FIELD_MAP",
+      "kind": "fieldMap",
+      "required": true,
+      "resolutionSource": "the approved before/after output contract",
+      "unresolvedBehavior": "block_generation"
+    },
+    {
+      "name": "VERSION_FIELD",
+      "kind": "field",
+      "required": false,
+      "resolutionSource": "an existing target-solution optimistic-lock field",
+      "unresolvedBehavior": "omit_optional_feature"
+    },
+    {
+      "name": "EXPECTED_VERSION",
+      "kind": "calculation",
+      "required": false,
+      "resolutionSource": "the caller's explicit optimistic-lock contract",
+      "unresolvedBehavior": "omit_optional_feature"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Set Error Capture",
+      "purpose": "Keep find, lock, field, commit, and revert failures under script control.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {
+        "psos": "FMSE always behaves as Set Error Capture On; do not depend on an Off state.",
+        "server_schedule": "FMSE always behaves as Set Error Capture On; do not depend on an Off state."
+      }
+    },
+    {
+      "name": "Go to Layout",
+      "purpose": "Establish the update context explicitly.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "Do not use animation; resolve the layout explicitly because client context is not inherited.",
+        "server_schedule": "Do not use animation; resolve the layout explicitly because no client context exists."
+      }
+    },
+    {
+      "name": "Enter Find Mode",
+      "purpose": "Enter Find mode without an interactive pause.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "Pause must be Off because FMSE cannot provide interactive input.",
+        "server_schedule": "Pause must be Off because FMSE cannot provide interactive input."
+      }
+    },
+    {
+      "name": "Set Field",
+      "purpose": "Set the find criterion and then only fields explicitly present in {{FIELD_ASSIGNMENTS}}.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {}
+    },
+    {
+      "name": "Perform Find",
+      "purpose": "Run the primary-key find reused from find-one-by-primary-key.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {}
+    },
+    {
+      "name": "Open Record/Request",
+      "purpose": "Attempt to open the one matched record for editing before changing fields.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {}
+    },
+    {
+      "name": "Commit Records/Requests",
+      "purpose": "Commit without a dialog and expose validation, locking, and privilege failures.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "With dialog must be Off; save and validate record data explicitly.",
+        "server_schedule": "With dialog must be Off; save and validate record data explicitly."
+      }
+    },
+    {
+      "name": "Revert Record/Request",
+      "purpose": "Optionally discard failed uncommitted changes under a reviewed policy.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "partial",
+        "server_schedule": "partial"
+      },
+      "rendererStatus": "not_verified",
+      "partialConditions": {
+        "psos": "With dialog must be Off; reverting discards all uncommitted changes in the current record.",
+        "server_schedule": "With dialog must be Off; reverting discards all uncommitted changes in the current record."
+      }
+    },
+    {
+      "name": "Set Variable",
+      "purpose": "Preserve errors, found count, record-open state, and approved before/after values.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "If",
+      "purpose": "Branch on find count, lock state, optional version, field assignment, and commit result.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Else",
+      "purpose": "Separate success from conflict and failure recovery.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "End If",
+      "purpose": "Close every update branch explicitly.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    },
+    {
+      "name": "Exit Script",
+      "purpose": "Return approved before/after data or the preserved update error.",
+      "requiredContexts": [
+        "client",
+        "psos",
+        "server_schedule"
+      ],
+      "compatibility": {
+        "client": "available",
+        "psos": "available",
+        "server_schedule": "available"
+      },
+      "rendererStatus": "experimental",
+      "partialConditions": {}
+    }
+  ],
+  "functions": [
+    {
+      "name": "Get ( LastError )",
+      "purpose": "Preserve find, open, field, commit, and revert errors immediately.",
+      "sourceIds": [
+        "claris-fm19-function-get-lasterror"
+      ]
+    },
+    {
+      "name": "Get ( FoundCount )",
+      "purpose": "Require exactly one matching record before opening it.",
+      "sourceIds": [
+        "claris-fm19-function-get-foundcount"
+      ]
+    },
+    {
+      "name": "Get ( RecordOpenState )",
+      "purpose": "Inspect record-open state after the explicit open attempt.",
+      "sourceIds": [
+        "claris-fm19-function-get-recordopenstate"
+      ]
+    },
+    {
+      "name": "JSONSetElement",
+      "purpose": "Build the result with approved before/after values and conflict details.",
+      "sourceIds": [
+        "claris-fm19-function-jsonsetelement"
+      ]
+    }
+  ],
+  "happyPath": [
+    "Validate input, then reuse find-one-by-primary-key with {{TARGET_LAYOUT}}, {{TARGET_TABLE_OCCURRENCE}}, {{PRIMARY_KEY_FIELD}}, and {{PRIMARY_KEY_VALUE_EXPRESSION}} through the exactly-one result check.",
+    "Return immediately for zero or multiple matches; never update an arbitrary record.",
+    "Open Record/Request and immediately capture Get ( LastError ), then inspect Get ( RecordOpenState ).",
+    "If {{VERSION_FIELD}} and {{EXPECTED_VERSION}} are both resolved, compare them before applying changes; otherwise omit optimistic locking explicitly.",
+    "Capture approved before-values from {{OUTPUT_FIELD_MAP}}.",
+    "Set only properties present in {{FIELD_ASSIGNMENTS}}; an omitted property means no change, while an explicit empty string means clear only when the contract allows it.",
+    "Commit Records/Requests with dialog Off and immediately preserve Get ( LastError ).",
+    "Return UPDATED with approved before/after values only after a zero commit error."
+  ],
+  "errorBranches": [
+    {
+      "code": "RECORD_NOT_FOUND",
+      "trigger": "The reused find pattern produces zero matches.",
+      "fileMakerCodes": [
+        401
+      ],
+      "action": "Return without opening or modifying any record."
+    },
+    {
+      "code": "PRIMARY_KEY_NOT_UNIQUE",
+      "trigger": "The reused find pattern produces multiple matches.",
+      "fileMakerCodes": [],
+      "action": "Return a data-integrity error and do not select a record."
+    },
+    {
+      "code": "RECORD_LOCKED",
+      "trigger": "Open Record/Request reports that the record or table is in use.",
+      "fileMakerCodes": [
+        301,
+        302
+      ],
+      "action": "Return a conflict or apply only a bounded, idempotent retry policy."
+    },
+    {
+      "code": "OPTIMISTIC_LOCK_CONFLICT",
+      "trigger": "{{VERSION_FIELD}} does not equal {{EXPECTED_VERSION}} or FileMaker reports a modification-ID mismatch.",
+      "fileMakerCodes": [
+        306
+      ],
+      "action": "Reload and let the caller resolve intent; never overwrite blindly."
+    },
+    {
+      "code": "PRIVILEGE_DENIED",
+      "trigger": "The account cannot read, open, or edit the record or a target field.",
+      "fileMakerCodes": [
+        200,
+        201,
+        202
+      ],
+      "action": "Return an authorization failure without exposing protected values."
+    },
+    {
+      "code": "FIELD_ASSIGNMENT_FAILED",
+      "trigger": "A Set Field step fails.",
+      "fileMakerCodes": [
+        102,
+        201
+      ],
+      "action": "Stop further assignments and follow the reviewed revert policy."
+    },
+    {
+      "code": "VALIDATION_FAILED",
+      "trigger": "Commit fails field validation.",
+      "fileMakerCodes": [
+        500,
+        501,
+        502,
+        503,
+        504,
+        505,
+        506,
+        507,
+        509
+      ],
+      "action": "Return a validation result; do not expose sensitive before-values."
+    },
+    {
+      "code": "COMMIT_CONFLICT",
+      "trigger": "The record was modified by another user before commit.",
+      "fileMakerCodes": [
+        512
+      ],
+      "action": "Return a conflict and require the caller to reload and re-evaluate."
+    },
+    {
+      "code": "COMMIT_FAILED",
+      "trigger": "Commit returns any other nonzero result.",
+      "fileMakerCodes": [],
+      "action": "Preserve the error, report that changes may remain uncommitted, and apply only the reviewed revert policy."
+    }
+  ],
+  "concurrencyNotes": [
+    "PSOS and schedules can update the same record concurrently; opening a record and checking commit are both required.",
+    "Optimistic locking is optional only when the target solution lacks an approved version field; never invent {{VERSION_FIELD}}.",
+    "A retry is safe only when the request is idempotent and the entire update intent is re-read and re-evaluated.",
+    "The before-value snapshot can become stale; it is an audit/result aid, not a lock."
+  ],
+  "securityNotes": [
+    "Verify record and field privileges before reading before-values or applying changes.",
+    "Limit {{OUTPUT_FIELD_MAP}} to values approved for the caller.",
+    "Revert Record/Request discards all uncommitted changes in the record and requires an explicit policy.",
+    "Do not log sensitive old or new values merely to diagnose a conflict."
+  ],
+  "examples": {
+    "inputJson": "{\n  \"schemaVersion\": 1,\n  \"requestId\": \"req-synthetic-004\",\n  \"primaryKey\": \"synthetic-key-004\",\n  \"changes\": {\n    \"displayValue\": \"Updated synthetic value\"\n  },\n  \"expectedVersion\": 3\n}",
+    "successJson": "{\n  \"ok\": true,\n  \"code\": \"UPDATED\",\n  \"message\": \"\",\n  \"data\": {\n    \"primaryKey\": \"synthetic-key-004\",\n    \"before\": {\n      \"displayValue\": \"Synthetic value\"\n    },\n    \"after\": {\n      \"displayValue\": \"Updated synthetic value\"\n    }\n  },\n  \"error\": null,\n  \"meta\": {\n    \"pattern\": \"update-record\",\n    \"schemaVersion\": 1\n  }\n}",
+    "failureJson": "{\n  \"ok\": false,\n  \"code\": \"RECORD_LOCKED\",\n  \"message\": \"The record is being edited in another session.\",\n  \"data\": null,\n  \"error\": {\n    \"fileMakerCode\": 301,\n    \"step\": \"Open Record/Request\",\n    \"details\": \"\"\n  },\n  \"meta\": {\n    \"pattern\": \"update-record\",\n    \"schemaVersion\": 1\n  }\n}"
+  },
+  "sourceIds": [
+    "claris-current-error-codes",
+    "claris-fm19-functions-reference",
+    "claris-fm19-function-get-foundcount",
+    "claris-fm19-function-get-lasterror",
+    "claris-fm19-function-get-recordopenstate",
+    "claris-fm19-function-jsonsetelement",
+    "claris-fm19-running-scripts-on-server",
+    "claris-fm19-script-steps-reference",
+    "claris-fm19-step-commit-records-requests",
+    "claris-fm19-step-else",
+    "claris-fm19-step-end-if",
+    "claris-fm19-step-enter-find-mode",
+    "claris-fm19-step-exit-script",
+    "claris-fm19-step-go-to-layout",
+    "claris-fm19-step-if-script-step",
+    "claris-fm19-step-open-record-request",
+    "claris-fm19-step-perform-find",
+    "claris-fm19-step-revert-record-request",
+    "claris-fm19-step-set-error-capture",
+    "claris-fm19-step-set-field",
+    "claris-fm19-step-set-variable"
+  ],
+  "verificationStatus": "design_only"
+}

@@ -11,6 +11,7 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 from fms19_toolkit.compatibility_policy import validate_compatibility_catalog
+from fms19_toolkit.pattern_policy import validate_practical_patterns
 from fms19_toolkit.research_policy import validate_issue_7_research
 
 EVIDENCE_LEVELS = (
@@ -95,6 +96,19 @@ REQUIRED_PATHS = (
     "catalog/fm19.5/verified-steps.json",
     "catalog/fm19.5/compatibility/script-steps.json",
     "catalog/fm19.5/compatibility/sources.json",
+    "patterns/README.md",
+    "patterns/fm19.5/index.json",
+    "patterns/fm19.5/common-result.schema.json",
+    "patterns/fm19.5/create-record/README.md",
+    "patterns/fm19.5/create-record/pattern.json",
+    "patterns/fm19.5/find-one-by-primary-key/README.md",
+    "patterns/fm19.5/find-one-by-primary-key/pattern.json",
+    "patterns/fm19.5/json-parameter-validation/README.md",
+    "patterns/fm19.5/json-parameter-validation/pattern.json",
+    "patterns/fm19.5/perform-script-on-server/README.md",
+    "patterns/fm19.5/perform-script-on-server/pattern.json",
+    "patterns/fm19.5/update-record/README.md",
+    "patterns/fm19.5/update-record/pattern.json",
     "examples/server-script-ir-v2.json",
     "scripts/build_compatibility_catalog.py",
     "scripts/smoke_test_wheel.py",
@@ -566,4 +580,5 @@ def check_repository(root: str | Path) -> list[str]:
     _validate_script_ir_artifacts(root_path, errors)
     errors.extend(validate_issue_7_research(root_path))
     errors.extend(validate_compatibility_catalog(root_path))
+    errors.extend(validate_practical_patterns(root_path))
     return errors
