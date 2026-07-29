@@ -58,6 +58,19 @@ A step must not be called `verified` solely because the renderer emits well-form
 - Scoring dimensions and failure severity are defined.
 - The case does not depend on one model's exact wording.
 
+## Copilot knowledge document/package
+
+- Each document has one bounded primary responsibility.
+- No company-specific information, real object name, URL, credential, data, DDR, screenshot, or log is included.
+- Compatibility and behavioral claims cite valid Source IDs in the applicable existing registry.
+- The target is FileMaker Pro/Server 19.5 and later-version behavior is not represented as 19.5 capability.
+- Required information, optional information, explicit omissions, and blocking unknowns are distinguished.
+- The human-readable output contract separates design status, XML output, automated checks, paste, client runtime, and FMSE verification.
+- A complete synthetic example resolves its adopted scope and contains a catalog-backed Compatibility ledger.
+- Repository policy checks required files, relative links, Source IDs, completion dimensions, and the example ledger deterministically.
+- FileMaker device evidence remains explicit and is not inferred from source review, package policy, tests, or CI.
+- Independent review checks the original requirement, full package, source boundary, target version, information safety, and test sufficiency.
+
 ## Release
 
 - Version and changelog are updated.

@@ -44,7 +44,7 @@ XML、Script IR、clipboardは正式成果物ではありません。既存機�
 
 このリポジトリを、FileMaker Server 19.5の一般知識、互換性、設計ルール、判断、実用パターンを編集・レビューする正本とします。
 
-後続PRで、M365 Copilotが参照する範囲を短いMarkdownへ限定します。`docs/copilot/`はまだ作成されていません。
+M365 Copilotが参照する公開知識の範囲は、[`docs/copilot/`](copilot/README.md)のv0.1 Markdown packageへ限定します。これは公開GitHubで編集・レビューする正本の一部であり、社内情報を含みません。
 
 ### 社内SharePoint
 
@@ -54,6 +54,6 @@ XML、Script IR、clipboardは正式成果物ではありません。既存機�
 
 ### Microsoft 365 Copilot
 
-後続PRで公開GitHubからSharePointへ限定配置する知識と、社内SharePointの対象システム情報を組み合わせ、人間向けスクリプト設計書を生成する役割です。
+Issue #15の後続工程で公開GitHubからSharePointへ限定配置する知識と、社内SharePointの対象システム情報を組み合わせ、人間向けスクリプト設計書を生成する役割です。
 
 Copilotの出力は人間レビューを必須とします。FileMakerへ直接書き込まず、FileMaker担当者がScript Workspaceへ手作業で実装してテストします。

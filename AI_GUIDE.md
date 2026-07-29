@@ -4,6 +4,8 @@
 
 中心成果物は、FileMaker担当者がScript Workspaceへ手作業で実装できる設計書です。XML、Script IR、clipboard出力は中心成果物ではありません。
 
+Copilot向け公開知識のknowledge-first入口は、[`docs/copilot/README.md`](docs/copilot/README.md)です。詳細な正規契約は本ファイルとrepository文書を正本とし、package内ではAIが読む範囲へ限定して参照します。
+
 ## 対象
 
 - FileMaker Server 19.5にホストされたカスタムApp

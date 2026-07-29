@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import re
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
@@ -113,6 +113,54 @@ REQUIRED_PATHS = (
     "scripts/build_compatibility_catalog.py",
     "scripts/smoke_test_wheel.py",
 )
+
+COPILOT_REQUIRED_PATHS = (
+    "docs/copilot/README.md",
+    "docs/copilot/00-purpose-and-scope.md",
+    "docs/copilot/01-filemaker-server-19.5-rules.md",
+    "docs/copilot/02-execution-context-decision.md",
+    "docs/copilot/03-script-style.md",
+    "docs/copilot/04-error-handling.md",
+    "docs/copilot/05-record-lock-commit-retry-idempotency.md",
+    "docs/copilot/06-practical-patterns.md",
+    "docs/copilot/07-later-version-exclusions.md",
+    "docs/copilot/08-required-internal-context.md",
+    "docs/copilot/09-output-contract.md",
+    "docs/copilot/10-human-review-and-testing.md",
+    "docs/copilot/examples/synthetic-complete-design.md",
+)
+COPILOT_SOURCE_REQUIRED_FILES = (
+    "docs/copilot/01-filemaker-server-19.5-rules.md",
+    "docs/copilot/02-execution-context-decision.md",
+    "docs/copilot/03-script-style.md",
+    "docs/copilot/04-error-handling.md",
+    "docs/copilot/05-record-lock-commit-retry-idempotency.md",
+    "docs/copilot/06-practical-patterns.md",
+    "docs/copilot/07-later-version-exclusions.md",
+)
+COPILOT_CONTEXTS = (
+    "client",
+    "psos",
+    "server_schedule",
+    "webdirect",
+    "filemaker_go",
+    "data_api",
+    "custom_web_publishing",
+)
+COPILOT_COMPLETION_DIMENSIONS = (
+    "Design status",
+    "XML output",
+    "Automated checks",
+    "Paste verification",
+    "Client runtime verification",
+    "FMSE verification",
+)
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+SOURCE_IDS_LINE_RE = re.compile(r"^Source IDs:\s*(.*)$", re.MULTILINE)
+COPILOT_CONTEXT_HEADING_RE = re.compile(
+    r"^###\s+.+?\s+—\s+`(?P<context>[^`]+)`\s*$"
+)
+COPILOT_STEP_LINE_RE = re.compile(r"^\d+\.\s+`(?P<step>[^`]+)`(?:\s|$)")
 
 
 def _load_json(path: Path, errors: list[str]) -> Any | None:
@@ -568,6 +616,322 @@ def _validate_script_ir_artifacts(root: Path, errors: list[str]) -> None:
             errors.append(f"examples/server-script-ir-v2.json: {exc}")
 
 
+def _read_copilot_markdown(path: Path, errors: list[str]) -> str | None:
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return None
+    except UnicodeDecodeError as exc:
+        errors.append(f"{path}: Copilot Markdown must be valid UTF-8: {exc}")
+    return None
+
+
+def _extract_markdown_section(text: str, heading: str) -> str | None:
+    match = re.search(rf"^##\s+{re.escape(heading)}\s*$", text, re.MULTILINE)
+    if match is None:
+        return None
+    start = match.end()
+    next_heading = re.search(r"^##\s+", text[start:], re.MULTILINE)
+    if next_heading is None:
+        return text[start:]
+    return text[start : start + next_heading.start()]
+
+
+def _validate_copilot_links(root: Path, errors: list[str]) -> None:
+    package_root = root / "docs/copilot"
+    if not package_root.is_dir():
+        return
+    resolved_root = root.resolve()
+    for path in sorted(package_root.rglob("*.md")):
+        text = _read_copilot_markdown(path, errors)
+        if text is None:
+            continue
+        for raw_target in MARKDOWN_LINK_RE.findall(text):
+            target = raw_target.strip()
+            if target.startswith("<") and target.endswith(">"):
+                target = target[1:-1].strip()
+            parsed = urlparse(target)
+            if parsed.scheme or target.startswith("#"):
+                continue
+            relative_path = unquote(parsed.path)
+            if not relative_path:
+                continue
+            if relative_path.startswith("/"):
+                resolved_target = (resolved_root / relative_path.lstrip("/")).resolve()
+            else:
+                resolved_target = (path.parent / relative_path).resolve()
+            try:
+                resolved_target.relative_to(resolved_root)
+            except ValueError:
+                errors.append(
+                    f"{path.relative_to(root)}: relative link escapes repository: "
+                    f"{raw_target}"
+                )
+                continue
+            if not resolved_target.exists():
+                errors.append(
+                    f"{path.relative_to(root)}: broken relative link: {raw_target}"
+                )
+
+
+def _validate_copilot_source_ids(
+    texts: dict[str, str],
+    known_source_ids: set[str],
+    errors: list[str],
+) -> None:
+    for relative in COPILOT_SOURCE_REQUIRED_FILES:
+        text = texts.get(relative)
+        if text is None:
+            continue
+        if not re.search(r"^## Source IDs\s*$", text, re.MULTILINE):
+            errors.append(f"{relative}: missing ## Source IDs section")
+            continue
+        matches = SOURCE_IDS_LINE_RE.findall(text)
+        if len(matches) != 1:
+            errors.append(f"{relative}: requires exactly one Source IDs: line")
+            continue
+        payload = matches[0].strip()
+        source_ids = re.findall(r"`([^`]+)`", payload)
+        if not payload or not source_ids:
+            errors.append(f"{relative}: Source IDs must not be empty")
+            continue
+        if len(source_ids) != len(set(source_ids)):
+            errors.append(f"{relative}: duplicate Source IDs are not allowed")
+        unknown = set(source_ids) - known_source_ids
+        if unknown:
+            errors.append(f"{relative}: unknown Source IDs: {sorted(unknown)}")
+
+
+def _strip_code_ticks(value: str) -> str:
+    stripped = value.strip()
+    if stripped.startswith("`") and stripped.endswith("`") and len(stripped) >= 2:
+        return stripped[1:-1].strip()
+    return stripped
+
+
+def _compatibility_steps(compatibility_data: Any) -> dict[str, dict[str, Any]]:
+    if not isinstance(compatibility_data, dict):
+        return {}
+    steps = compatibility_data.get("steps")
+    if not isinstance(steps, list):
+        return {}
+    return {
+        step["name"]: step
+        for step in steps
+        if isinstance(step, dict) and isinstance(step.get("name"), str)
+    }
+
+
+def _validate_copilot_compatibility_ledger(
+    example_text: str,
+    compatibility_data: Any,
+    errors: list[str],
+) -> tuple[set[tuple[str, str]], dict[str, dict[str, Any]]]:
+    section = _extract_markdown_section(example_text, "Compatibility ledger")
+    catalog_steps = _compatibility_steps(compatibility_data)
+    if section is None:
+        errors.append(
+            "docs/copilot/examples/synthetic-complete-design.md: "
+            "missing ## Compatibility ledger"
+        )
+        return set(), catalog_steps
+
+    ledger_pairs: set[tuple[str, str]] = set()
+    saw_header = False
+    for line in section.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [
+            _strip_code_ticks(cell)
+            for cell in line.strip().strip("|").split("|")
+        ]
+        if cells == ["Step", "Context", "Catalog support", "Resolved condition"]:
+            saw_header = True
+            continue
+        if cells and all(re.fullmatch(r":?-+:?", cell) for cell in cells):
+            continue
+        if len(cells) != 4:
+            errors.append(f"Copilot Compatibility ledger: malformed row: {line}")
+            continue
+        step_name, context, support, resolved_condition = cells
+        pair = (step_name, context)
+        if pair in ledger_pairs:
+            errors.append(
+                "Copilot Compatibility ledger: duplicate step/context: "
+                f"{step_name} / {context}"
+            )
+        ledger_pairs.add(pair)
+
+        step = catalog_steps.get(step_name)
+        if step is None:
+            errors.append(
+                f"Copilot Compatibility ledger: unknown step: {step_name}"
+            )
+            continue
+        if context not in COPILOT_CONTEXTS:
+            errors.append(
+                f"Copilot Compatibility ledger: unknown context: {context}"
+            )
+            continue
+        execution = step.get("execution")
+        catalog_support = (
+            execution.get(context) if isinstance(execution, dict) else None
+        )
+        if support != catalog_support:
+            errors.append(
+                "Copilot Compatibility ledger: catalog support mismatch for "
+                f"{step_name} / {context}: expected {catalog_support}, got {support}"
+            )
+        if catalog_support in {"unknown", "unavailable"}:
+            errors.append(
+                "Copilot Compatibility ledger: "
+                f"{step_name} / {context} has rejected support {catalog_support}"
+            )
+        if support == "partial" and resolved_condition in {"", "-", "—"}:
+            errors.append(
+                "Copilot Compatibility ledger: partial support requires a "
+                f"resolved condition for {step_name} / {context}"
+            )
+
+    if not saw_header:
+        errors.append("Copilot Compatibility ledger: missing canonical table header")
+    if not ledger_pairs:
+        errors.append("Copilot Compatibility ledger: must contain at least one row")
+    return ledger_pairs, catalog_steps
+
+
+def _validate_copilot_script_steps(
+    example_text: str,
+    ledger_pairs: set[tuple[str, str]],
+    catalog_steps: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    section = _extract_markdown_section(
+        example_text, "FileMaker-format script steps"
+    )
+    if section is None:
+        errors.append(
+            "docs/copilot/examples/synthetic-complete-design.md: "
+            "missing ## FileMaker-format script steps"
+        )
+        return
+
+    current_context: str | None = None
+    script_pairs: set[tuple[str, str]] = set()
+    for line in section.splitlines():
+        heading = COPILOT_CONTEXT_HEADING_RE.match(line)
+        if heading is not None:
+            current_context = heading.group("context")
+            if current_context not in COPILOT_CONTEXTS:
+                errors.append(
+                    "Copilot script steps: unknown context heading: "
+                    f"{current_context}"
+                )
+            continue
+        step_match = COPILOT_STEP_LINE_RE.match(line)
+        if step_match is None:
+            continue
+        step_name = step_match.group("step")
+        if current_context is None:
+            errors.append(
+                f"Copilot script steps: step has no context heading: {step_name}"
+            )
+            continue
+        if step_name not in catalog_steps:
+            errors.append(f"Copilot script steps: unknown step: {step_name}")
+        script_pairs.add((step_name, current_context))
+
+    if not script_pairs:
+        errors.append("Copilot script steps: no FileMaker steps found")
+        return
+    missing = sorted(script_pairs - ledger_pairs)
+    if missing:
+        errors.append(
+            "Copilot script steps: missing from Compatibility ledger: "
+            f"{missing}"
+        )
+
+
+def _collect_copilot_source_ids(
+    root: Path,
+    implementation_source_ids: set[str],
+    errors: list[str],
+) -> set[str]:
+    compatibility_registry = _load_json(
+        root / "catalog/fm19.5/compatibility/sources.json", errors
+    )
+    implementation_registry = _load_json(root / "sources/registry.json", errors)
+
+    def records_by_id(data: Any) -> dict[str, dict[str, Any]]:
+        if not isinstance(data, dict) or not isinstance(data.get("sources"), list):
+            return {}
+        return {
+            source["id"]: source
+            for source in data["sources"]
+            if isinstance(source, dict) and isinstance(source.get("id"), str)
+        }
+
+    compatibility_sources = records_by_id(compatibility_registry)
+    implementation_sources = records_by_id(implementation_registry)
+    for source_id in sorted(compatibility_sources.keys() & implementation_sources):
+        compatibility_url = compatibility_sources[source_id].get("url")
+        implementation_url = implementation_sources[source_id].get("url")
+        if compatibility_url != implementation_url:
+            errors.append(
+                "Copilot source ID collision: "
+                f"{source_id} maps to {compatibility_url!r} and "
+                f"{implementation_url!r}"
+            )
+    return implementation_source_ids | set(compatibility_sources)
+
+
+def _validate_copilot_package(
+    root: Path,
+    known_source_ids: set[str],
+    compatibility_data: Any,
+    errors: list[str],
+) -> None:
+    texts: dict[str, str] = {}
+    for relative in COPILOT_REQUIRED_PATHS:
+        path = root / relative
+        if not path.is_file():
+            errors.append(f"missing required Copilot package file: {relative}")
+            continue
+        text = _read_copilot_markdown(path, errors)
+        if text is not None:
+            texts[relative] = text
+
+    _validate_copilot_links(root, errors)
+    _validate_copilot_source_ids(texts, known_source_ids, errors)
+
+    readme = texts.get("docs/copilot/README.md", "")
+    if "Knowledge package version: 0.1.0" not in readme:
+        errors.append("docs/copilot/README.md: package version must be 0.1.0")
+    if "Target: FileMaker Pro 19.5 / FileMaker Server 19.5" not in readme:
+        errors.append(
+            "docs/copilot/README.md: target must be "
+            "FileMaker Pro 19.5 / FileMaker Server 19.5"
+        )
+
+    output_contract = texts.get("docs/copilot/09-output-contract.md", "")
+    for dimension in COPILOT_COMPLETION_DIMENSIONS:
+        if f"{dimension}:" not in output_contract:
+            errors.append(
+                "docs/copilot/09-output-contract.md: missing completion "
+                f"dimension: {dimension}"
+            )
+
+    example = texts.get(
+        "docs/copilot/examples/synthetic-complete-design.md", ""
+    )
+    ledger_pairs, catalog_steps = _validate_copilot_compatibility_ledger(
+        example, compatibility_data, errors
+    )
+    _validate_copilot_script_steps(
+        example, ledger_pairs, catalog_steps, errors
+    )
+
+
 def check_repository(root: str | Path) -> list[str]:
     root_path = Path(root).resolve()
     errors: list[str] = []
@@ -576,9 +940,18 @@ def check_repository(root: str | Path) -> list[str]:
             errors.append(f"missing required path: {relative}")
     _load_json(root_path / "schemas/source-registry.schema.json", errors)
     known_sources = _validate_source_registry(root_path, errors)
+    copilot_source_ids = _collect_copilot_source_ids(
+        root_path, known_sources, errors
+    )
+    compatibility_data = _load_json(
+        root_path / "catalog/fm19.5/compatibility/script-steps.json", errors
+    )
     _validate_step_catalog(root_path, known_sources, errors)
     _validate_script_ir_artifacts(root_path, errors)
     errors.extend(validate_issue_7_research(root_path))
     errors.extend(validate_compatibility_catalog(root_path))
     errors.extend(validate_practical_patterns(root_path))
+    _validate_copilot_package(
+        root_path, copilot_source_ids, compatibility_data, errors
+    )
     return errors

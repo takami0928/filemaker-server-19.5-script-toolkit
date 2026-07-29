@@ -1,7 +1,7 @@
 # 既知の制約
 
-- Copilot向けの`docs/copilot/` knowledge packageはまだ作成していない。
-- SharePoint配布パッケージ、SharePoint上での公開知識と社内情報の統合運用、M365 Copilotの受入試験はまだ実施していない。
+- Copilot向けの`docs/copilot/` knowledge package v0.1は作成した。公開source、59-step互換性カタログ、5つの`design_only`パターン、完全な合成例に基づくが、source-backedであることはFileMaker runtime保証を意味しない。
+- SharePoint配布パッケージは未作成であり、SharePoint上での公開知識と社内情報の統合運用、M365 Copilot pilot、受入試験はまだ実施していない。
 - M365 Copilotが社内文書を正しく、完全に、最新状態として解釈することは保証しない。確認済み事実、仮定、不足情報の分離と人間レビューが必要である。
 - 公開知識と社内情報のライブラリ、権限、検索範囲の境界はSharePoint側でも別途設定する必要がある。このリポジトリだけでは境界を強制できない。
 - 中心成果物は人間向け設計書であり、FileMaker担当者によるScript Workspaceへの手作業実装、レビュー、テストが必要である。
