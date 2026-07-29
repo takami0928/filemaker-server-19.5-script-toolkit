@@ -22,7 +22,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 
 **Blocking for catalog/specification changes**
 
-- Every compatibility or behavioral claim has at least one valid `sourceId` in `sources/registry.json`.
+- Every compatibility or behavioral claim has at least one valid `sourceId` in its registered source registry. Normalized compatibility entries use `catalog/fm19.5/compatibility/sources.json`; other implementation claims use `sources/registry.json`.
 - Primary Claris documentation is preferred where available.
 - Secondary sources cannot independently promote a claim beyond `public_fixture_observed`.
 - Unknown behavior remains `unknown` or fail-closed.
@@ -52,7 +52,7 @@ These gates apply to every pull request. A gate marked **blocking** must pass be
 
 - Unit tests pass on all supported Python versions.
 - Repository policy validation passes.
-- A built wheel validates and migrates IR outside the repository using installed schema data.
+- A built wheel validates and migrates IR and queries the compatibility CLI outside the repository using installed schema/catalog data.
 - Generated output is deterministic.
 - Invalid input fails closed with an actionable error.
 - Clipboard contents are not modified after validation failure.

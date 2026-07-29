@@ -103,6 +103,31 @@ def main() -> int:
             cwd=outside_dir,
             env=installed_env,
         )
+        _run(
+            [
+                str(fms19),
+                "compat",
+                "Perform Script on Server",
+                "--context",
+                "psos",
+                "--json",
+            ],
+            cwd=outside_dir,
+            env=installed_env,
+        )
+        _run(
+            [
+                str(fms19),
+                "list-steps",
+                "--context",
+                "server_schedule",
+                "--support",
+                "unavailable",
+                "--json",
+            ],
+            cwd=outside_dir,
+            env=installed_env,
+        )
         schema_check = "\n".join(
             [
                 "from pathlib import Path",
@@ -124,6 +149,42 @@ def main() -> int:
         )
         _run(
             [str(venv_python), "-c", schema_check],
+            cwd=outside_dir,
+            env=installed_env,
+        )
+        catalog_check = "\n".join(
+            [
+                "from pathlib import Path",
+                "import sysconfig",
+                "from fms19_toolkit.compatibility import (",
+                "    COMPATIBILITY_CATALOG_FILE,",
+                "    _locate_compatibility_path,",
+                "    load_compatibility_catalog,",
+                ")",
+                "catalog = load_compatibility_catalog()",
+                "if len(catalog['steps']) != 59:",
+                "    raise SystemExit('installed catalog does not contain 59 steps')",
+                "actual = _locate_compatibility_path(",
+                "    COMPATIBILITY_CATALOG_FILE",
+                ").resolve()",
+                "expected = (",
+                "    Path(sysconfig.get_path('data'))",
+                "    / 'share'",
+                "    / 'fms19-script-toolkit'",
+                "    / 'catalog'",
+                "    / 'fm19.5'",
+                "    / 'compatibility'",
+                "    / 'script-steps.json'",
+                ").resolve()",
+                "if actual != expected:",
+                "    raise SystemExit(",
+                "        f'wheel compatibility path mismatch: {actual} != {expected}'",
+                "    )",
+                "print(f'Installed compatibility catalog: {actual}')",
+            ]
+        )
+        _run(
+            [str(venv_python), "-c", catalog_check],
             cwd=outside_dir,
             env=installed_env,
         )

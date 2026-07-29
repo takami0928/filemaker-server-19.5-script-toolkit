@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
+from fms19_toolkit.compatibility_policy import validate_compatibility_catalog
 from fms19_toolkit.research_policy import validate_issue_7_research
 
 EVIDENCE_LEVELS = (
@@ -83,14 +84,19 @@ REQUIRED_PATHS = (
     "decisions/0000-template.md",
     "decisions/0001-govern-source-evidence-and-generation.md",
     "decisions/0002-script-ir-v2.md",
+    "decisions/0003-normalize-compatibility-catalog-and-cli.md",
     "docs/SCRIPT_IR.md",
+    "docs/COMPATIBILITY_CATALOG.md",
     "schemas/script-ir-v1.schema.json",
     "schemas/script-ir-v2.schema.json",
     "schemas/script-ir.schema.json",
     "schemas/source-registry.schema.json",
     "sources/registry.json",
     "catalog/fm19.5/verified-steps.json",
+    "catalog/fm19.5/compatibility/script-steps.json",
+    "catalog/fm19.5/compatibility/sources.json",
     "examples/server-script-ir-v2.json",
+    "scripts/build_compatibility_catalog.py",
     "scripts/smoke_test_wheel.py",
 )
 
@@ -559,4 +565,5 @@ def check_repository(root: str | Path) -> list[str]:
     _validate_step_catalog(root_path, known_sources, errors)
     _validate_script_ir_artifacts(root_path, errors)
     errors.extend(validate_issue_7_research(root_path))
+    errors.extend(validate_compatibility_catalog(root_path))
     return errors
