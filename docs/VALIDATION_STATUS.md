@@ -11,12 +11,13 @@
 - required package fileの存在
 - package内Markdownのrelative link先
 - source必須文書のSource IDsと両registryでの解決
+- packageと5パターンで使用する主要numeric error codeのSource IDが、FileMaker Pro 19公式archiveのregistry recordへ解決されること
 - package version `0.1.0`とtarget 19.5
 - output contractの6 completion-report dimensions
 - 合成例のCompatibility ledgerにあるstep、context、support、`partial`条件
 - FileMaker-format step listの全unique step／contextがledgerに存在すること
 
-これらはpackage structure、source ID、internal link、compatibility ledgerの自動検証です。FileMaker device validationは`not_run`です。
+これらはpackage structure、source ID、internal link、compatibility ledgerの自動検証です。archive本文との照合は独立したsource reviewであり、公開資料上のevidence boundaryです。FileMaker device validationは`not_run`です。
 
 ## 自動検証済み
 

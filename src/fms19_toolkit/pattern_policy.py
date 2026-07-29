@@ -719,10 +719,10 @@ def _validate_functions_and_errors(
         errors.append(
             f"{label}.errorBranches: duplicate code(s): {sorted(duplicate_codes)}"
         )
-    if used_numeric_codes and "claris-current-error-codes" not in pattern_sources:
+    if used_numeric_codes and "claris-fm19-error-codes" not in pattern_sources:
         errors.append(
             f"{label}: numeric FileMaker errors require the registered "
-            "candidate error-code source"
+            "FileMaker Pro 19 archive error-code source"
         )
 
 

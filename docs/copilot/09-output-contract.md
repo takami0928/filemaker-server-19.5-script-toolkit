@@ -3,10 +3,10 @@
 Copilotは、次の24 sectionをこの順序で出力します。値を不明なまま`TBD`で隠さず、section 9または10へ分類します。
 
 1. Design status
-2. Script name
+2. Script map
 3. Purpose
-4. Execution context
-5. Caller
+4. Execution topology
+5. Entry point and trigger
 6. Preconditions
 7. Confirmed facts
 8. Assumptions
@@ -36,6 +36,16 @@ Copilotは、次の24 sectionをこの順序で出力します。値を不明な
 - 実機試験を行っていないverificationは`not_run`とする。
 - internal IDを生成・推測しない。
 
+## 複数scriptの表現
+
+section 2は単一scriptでも複数scriptでも次のcanonical tableを使用し、1 scriptにつき1行を記載します。
+
+| Script | Primary responsibility | Context | Caller／trigger |
+| --- | --- | --- | --- |
+| [exact script name] | [one responsibility] | [canonical context] | [exact caller or trigger] |
+
+section 4はentry pointからcalleeまでの呼出関係をtreeで示し、各edgeについてsynchronous／asynchronous、exact parameter、result handoffを記載します。section 5はentry pointの外部triggerと、各scriptのexact callerを補足します。`client`、`psos`、`server_schedule`等を単一のexecution contextへまとめません。
+
 ## Script stepの粒度
 
 section 17は、FileMaker担当者が上から順に実装できる粒度で記載します。各stepにexact English step name、option、calculation、target object、branch conditionを併記します。各execution contextのcompatibilityを確認し、`partial`の解決条件も示します。
@@ -51,21 +61,29 @@ section 17は、FileMaker担当者が上から順に実装できる粒度で記�
 
 Design status: draft_design | implementation_ready
 
-## 2. Script name
+## 2. Script map
 
-[exact script name]
+| Script | Primary responsibility | Context | Caller／trigger |
+| --- | --- | --- | --- |
+| [exact script name] | [one responsibility] | [canonical context] | [exact caller or trigger] |
 
 ## 3. Purpose
 
-[one primary responsibility]
+- [script]: [one primary responsibility]
 
-## 4. Execution context
+## 4. Execution topology
 
-[client | psos | server_schedule | webdirect | filemaker_go | data_api | custom_web_publishing]
+```text
+[entry script] — [canonical context]
+    └─ [synchronous | asynchronous]; Parameter: [exact calculation]; Result: [exact handoff]
+       [callee script] — [canonical context]
+```
 
-## 5. Caller
+## 5. Entry point and trigger
 
-[exact caller and trigger]
+- Entry point: [exact script]
+- External caller／trigger: [exact caller or trigger]
+- Callee relationship: [caller, callee, parameter, result, wait behavior]
 
 ## 6. Preconditions
 

@@ -10,7 +10,8 @@
 | Table | `SYN_Task` |
 | TO | `SYN_TASK__by_id`。base tableは`SYN_Task`。 |
 | Layout | `SYN_Task_Server`。base TOは`SYN_TASK__by_id`。server処理専用で、animationやdialogを使用しない。 |
-| Caller script | `SYN_UI_RequestTaskUpdate` |
+| Existing entry caller script | `SYN_UI_TaskController`。合成UIからentry scriptを呼ぶ既存caller。 |
+| Client entry script | `SYN_UI_RequestTaskUpdate` |
 | Server script | `SYN_SRV_UpdateTask` |
 | Existing helper script | `SYN_SYS_ValidateJsonContract`。`json-parameter-validation` patternを実装済みとする合成helper。 |
 | Existing custom function | `SYN_Result ( ok ; code ; message ; dataJson ; fileMakerCode ; stepName ; details ; patternName )` |
@@ -57,30 +58,48 @@ Design status: implementation_ready
 
 採用した機能に必要な合成object、helper contract、privilege、exact option、retry上限、idempotency field、version fieldはすべてこの例で解決済みです。
 
-## Script name
+## Script map
 
-- `SYN_UI_RequestTaskUpdate`
-- `SYN_SRV_UpdateTask`
+| Script | Primary responsibility | Context | Caller／trigger |
+| --- | --- | --- | --- |
+| `SYN_UI_RequestTaskUpdate` | requestを検証し、同期PSOSのcall resultとbusiness resultを分離する | `client` | `SYN_UI_TaskController`からversion付きJSON parameterで呼ばれる |
+| `SYN_SRV_UpdateTask` | 1件のtaskをidempotentかつoptimistic version付きで更新する | `psos` | `SYN_UI_RequestTaskUpdate`の`Perform Script on Server`、Wait for completion On |
 
 ## Purpose
 
 - `SYN_UI_RequestTaskUpdate`: validated requestを同期PSOSへ渡し、call failureとserver business resultを分離してcallerへ返す。
 - `SYN_SRV_UpdateTask`: 1件の`SYN_Task`をidempotentかつoptimistic version付きで更新し、Commit結果を返す。
 
-## Execution context
+## Execution topology
 
-- caller: `client`
-- server target: `psos`
+```text
+SYN_UI_TaskController — client（既存の外部caller）
+    └─ Parameter: SYN_TaskUpdateRequest_v1 document
+       SYN_UI_RequestTaskUpdate — client（entry point）
+           └─ Perform Script on Server; Wait for completion: On
+              Parameter: $request
+              Result: Get ( ScriptResult ) → $serverResult
+              SYN_SRV_UpdateTask — psos
+```
 
-## Caller
+`SYN_UI_TaskController`からentry pointへのcallは同期で、parameterは[Input JSON contract](#input-json-contract)の完全なdocument、resultは`SYN_UI_RequestTaskUpdate`の`Exit Script` resultです。entry pointからserver scriptへのcallも同期で、validated `$request`を渡し、`Get ( ScriptResult )`を`$serverResult`へ保存します。server scriptは独立sessionとして全contextを再構築します。
 
-`SYN_UI_RequestTaskUpdate`は、別の合成UI controllerからversion付きJSON parameterで呼ばれます。callerは`SYN_SRV_UpdateTask`を`Perform Script on Server`のWait for completion Onで呼びます。server scriptは独立sessionとして全contextを再構築します。
+## Entry point and trigger
+
+- entry point: `SYN_UI_RequestTaskUpdate`
+- external caller／trigger: `SYN_UI_TaskController`が、合成UIのsubmit actionでversion付きJSON parameterを渡して同期実行する。
+- callee: `SYN_SRV_UpdateTask`
+- callee context: `psos`
+- wait behavior: Wait for completion On
+- callee parameter: `$request`
+- callee result: `Get ( ScriptResult )`を`$serverResult`へ保存し、contract検証後にentry callerへ返す。
 
 ## Preconditions
 
 - `SYN_Operations`がFileMaker Server 19.5へhostされている。
 - `SYN_Task_Server`のbase TOが`SYN_TASK__by_id`である。
 - `SYN_SYS_ValidateJsonContract`、`SYN_Result`、2つのcontractが上記どおり存在する。
+- `SYN_UI_TaskController`が上記Input JSON contractをparameterとして`SYN_UI_RequestTaskUpdate`を同期実行する。
 - 実行sessionが`SYN_Automation` privilegeを持つ。
 - `SYN_TaskId`、`SYN_Version`、`SYN_LastRequestId`のvalidation ruleが上記どおり設定済みである。`requestId`は1つのlogical requestへ一度だけ割り当て、異なるpayloadへ再利用しない。
 - server側のrelated-file authenticationは`not_applicable`である。
@@ -166,6 +185,7 @@ Design status: implementation_ready
 | field | `SYN_TASK__by_id::SYN_LastResultJson` | duplicate requestへのresult replay |
 | script | `SYN_UI_RequestTaskUpdate` | client wrapper |
 | script | `SYN_SRV_UpdateTask` | PSOS business script |
+| existing script | `SYN_UI_TaskController` | entry pointへversion付きJSONを渡すUI caller |
 | existing script | `SYN_SYS_ValidateJsonContract` | request／result validation |
 | existing custom function | `SYN_Result` | 共通result生成 |
 
@@ -175,7 +195,7 @@ internal object IDは使用しません。
 
 `SYN_Automation`は次を持ちます。
 
-- 3 scriptのexecute権限
+- 4 scriptのexecute権限
 - `SYN_Task`のrecord read／edit権限
 - 6 fieldのview権限と、`SYN_Status`、`SYN_Version`、`SYN_LastRequestId`、`SYN_LastRequestJson`、`SYN_LastResultJson`のedit権限
 - `SYN_Task_Server`を使用するために必要なaccess
@@ -187,7 +207,7 @@ delete、create、schema変更、credential参照の権限は不要です。
 | Variable | Calculation／initial value | Purpose |
 | --- | --- | --- |
 | `$rawInput` | `Get ( ScriptParameter )` | caller／serverのraw parameter |
-| `$validationRequest` | helper用`contractName`＋`document` JSON | validation input |
+| `$validationRequest` | 各validation call直前のexact `JSONSetElement` calculation | validation input |
 | `$helperError` | helper `Perform Script`直後の`Get ( LastError )` | helper call error |
 | `$validationResult` | `Get ( ScriptResult )` | helper result |
 | `$request` | validated `data.document` | PSOS parameter |
@@ -197,9 +217,12 @@ delete、create、schema変更、credential参照の権限は不要です。
 | `$newStatus` | validated `payload.newStatus` | new value |
 | `$expectedVersion` | validated `payload.expectedVersion` | optimistic check |
 | `$requestId` | validated `requestId` | idempotency |
-| `$attempt` | `0`からincrement | 最大2回のretry |
-| `$lastRetryError` | emptyから開始 | exhaustion時に保持する最後のretryable error |
-| `$lastRetryStep` | emptyから開始 | exhaustion時に保持するstep |
+| `$attempt` | 初期値`0`、各loop先頭で`$attempt + 1` | 最大2回のretry |
+| `$lastRetryError` | 初期値`""` | exhaustion時に保持する最後のretryable error |
+| `$lastRetryStep` | 初期値`""` | exhaustion時に保持するstep |
+| `$layoutError` | `Go to Layout`直後の`Get ( LastError )` | server layout context |
+| `$findModeError` | `Enter Find Mode`直後の`Get ( LastError )` | find-mode transition |
+| `$criteriaError` | find条件用`Set Field`直後の`Get ( LastError )` | primary-key criterion |
 | `$findError` | `Perform Find`直後の`Get ( LastError )` | find result |
 | `$foundCount` | `Get ( FoundCount )` | exactly-one check |
 | `$openError` | `Open Record/Request`直後の`Get ( LastError )` | lock／privilege |
@@ -216,7 +239,7 @@ delete、create、schema変更、credential参照の権限は不要です。
 
 1. `Set Error Capture` [ On ]
 2. `Set Variable` [ `$rawInput` ; Value: `Get ( ScriptParameter )` ]
-3. `Set Variable` [ `$validationRequest` ; Value: `JSONSetElement`で`contractName = "SYN_TaskUpdateRequest_v1"`と`document = $rawInput`を設定 ]
+3. `Set Variable` [ `$validationRequest` ; Value: `JSONSetElement ( "{}" ; [ "contractName" ; "SYN_TaskUpdateRequest_v1" ; JSONString ] ; [ "document" ; $rawInput ; JSONString ] )` ]
 4. `Perform Script` [ Specified: `SYN_SYS_ValidateJsonContract` ; Parameter: `$validationRequest` ]
 5. `Set Variable` [ `$helperError` ; Value: `Get ( LastError )` ]
 6. `Set Variable` [ `$validationResult` ; Value: `Get ( ScriptResult )` ]
@@ -234,7 +257,7 @@ delete、create、schema変更、credential参照の権限は不要です。
 18. `Set Variable` [ `$serverResult` ; Value: `SYN_Result ( False ; "PSOS_CALL_FAILED" ; "The server script could not be completed." ; "null" ; $callError ; "Perform Script on Server" ; "" ; "perform-script-on-server" )` ]
 19. `Exit Script` [ Result: `$serverResult` ]
 20. `End If`
-21. `Set Variable` [ `$validationRequest` ; Value: `JSONSetElement`で`contractName = "SYN_CommonResult_v1"`と`document = $serverResult`を設定 ]
+21. `Set Variable` [ `$validationRequest` ; Value: `JSONSetElement ( "{}" ; [ "contractName" ; "SYN_CommonResult_v1" ; JSONString ] ; [ "document" ; $serverResult ; JSONString ] )` ]
 22. `Perform Script` [ Specified: `SYN_SYS_ValidateJsonContract` ; Parameter: `$validationRequest` ]
 23. `Set Variable` [ `$helperError` ; Value: `Get ( LastError )` ]
 24. `Set Variable` [ `$validationResult` ; Value: `Get ( ScriptResult )` ]
@@ -248,9 +271,9 @@ delete、create、schema変更、credential参照の権限は不要です。
 
 ### SYN_SRV_UpdateTask — `psos`
 
-1. `Set Error Capture` [ On。FMSEのOn動作に合わせ、Offへ切り替えない ]
+1. `Set Error Capture` [ On ]
 2. `Set Variable` [ `$rawInput` ; Value: `Get ( ScriptParameter )` ]
-3. `Set Variable` [ `$validationRequest` ; Value: `contractName = "SYN_TaskUpdateRequest_v1"`と`document = $rawInput` ]
+3. `Set Variable` [ `$validationRequest` ; Value: `JSONSetElement ( "{}" ; [ "contractName" ; "SYN_TaskUpdateRequest_v1" ; JSONString ] ; [ "document" ; $rawInput ; JSONString ] )` ]
 4. `Perform Script` [ Specified: `SYN_SYS_ValidateJsonContract` ; Parameter: `$validationRequest` ]
 5. `Set Variable` [ `$helperError` ; Value: `Get ( LastError )` ]
 6. `Set Variable` [ `$validationResult` ; Value: `Get ( ScriptResult )` ]
@@ -270,112 +293,124 @@ delete、create、schema変更、credential参照の権限は不要です。
 20. `Set Variable` [ `$lastRetryStep` ; Value: `""` ]
 21. `Loop`
 22. `Set Variable` [ `$attempt` ; Value: `$attempt + 1` ]
-23. `Go to Layout` [ `SYN_Task_Server` ; Animation: None ]
-24. `Enter Find Mode` [ Pause: Off ]
-25. `Set Field` [ `SYN_TASK__by_id::SYN_TaskId` ; `$taskId` ]
-26. `Perform Find`
-27. `Set Variable` [ `$findError` ; Value: `Get ( LastError )` ]
-28. `Set Variable` [ `$foundCount` ; Value: `Get ( FoundCount )` ]
-29. `If` [ `$findError = 401 or $foundCount = 0` ]
-30. `Exit Script` [ Result: `SYN_Result ( False ; "RECORD_NOT_FOUND" ; "No matching task was found." ; "null" ; If ( $findError = 0 ; "" ; $findError ) ; "Perform Find" ; "" ; "update-record" )` ]
-31. `End If`
-32. `If` [ `$findError ≠ 0 or $foundCount ≠ 1` ]
-33. `Exit Script` [ Result: `SYN_Result ( False ; If ( $foundCount > 1 ; "PRIMARY_KEY_NOT_UNIQUE" ; "FIND_FAILED" ) ; "The primary-key find did not resolve exactly one task." ; "null" ; If ( $findError = 0 ; "" ; $findError ) ; "Perform Find" ; "" ; "update-record" )` ]
-34. `End If`
-35. `Open Record/Request`
-36. `Set Variable` [ `$openError` ; Value: `Get ( LastError )` ]
-37. `If` [ `$openError = 301 or $openError = 302` ]
-38. `Set Variable` [ `$lastRetryError` ; Value: `$openError` ]
-39. `Set Variable` [ `$lastRetryStep` ; Value: `"Open Record/Request"` ]
-40. `Exit Loop If` [ `$attempt ≥ 2` ]
-41. `Else`
-42. `If` [ `$openError ≠ 0` ]
-43. `Exit Script` [ Result: `SYN_Result ( False ; If ( $openError = 200 or $openError = 201 or $openError = 202 ; "PRIVILEGE_DENIED" ; "OPEN_FAILED" ) ; "The task could not be opened for update." ; "null" ; $openError ; "Open Record/Request" ; "" ; "update-record" )` ]
-44. `End If`
-45. `If` [ `SYN_TASK__by_id::SYN_LastRequestId = $requestId` ]
-46. `If` [ `SYN_TASK__by_id::SYN_LastRequestJson ≠ $request` ]
-47. `Revert Record/Request` [ With dialog: Off ]
-48. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-49. `If` [ `$revertError ≠ 0` ]
-50. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The duplicate-request check could not release the record." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
-51. `End If`
-52. `Exit Script` [ Result: `SYN_Result ( False ; "DUPLICATE_REQUEST" ; "The request ID was reused with different input." ; "null" ; "" ; "SYN_LastRequestJson" ; "" ; "perform-script-on-server" )` ]
+23. `Go to Layout` [ Layout: `SYN_Task_Server` ; Animation: None ]
+24. `Set Variable` [ `$layoutError` ; Value: `Get ( LastError )` ]
+25. `If` [ `$layoutError ≠ 0` ]
+26. `Exit Script` [ Result: `SYN_Result ( False ; "CONTEXT_SETUP_FAILED" ; "The server layout context could not be established." ; "null" ; $layoutError ; "Go to Layout" ; "" ; "update-record" )` ]
+27. `End If`
+28. `Enter Find Mode` [ Pause: Off ]
+29. `Set Variable` [ `$findModeError` ; Value: `Get ( LastError )` ]
+30. `If` [ `$findModeError ≠ 0` ]
+31. `Exit Script` [ Result: `SYN_Result ( False ; "FIND_MODE_FAILED" ; "Find mode could not be entered." ; "null" ; $findModeError ; "Enter Find Mode" ; "" ; "find-one-by-primary-key" )` ]
+32. `End If`
+33. `Set Field` [ `SYN_TASK__by_id::SYN_TaskId` ; `$taskId` ]
+34. `Set Variable` [ `$criteriaError` ; Value: `Get ( LastError )` ]
+35. `If` [ `$criteriaError ≠ 0` ]
+36. `Exit Script` [ Result: `SYN_Result ( False ; "FIND_CRITERIA_FAILED" ; "The primary-key find criterion could not be set." ; "null" ; $criteriaError ; "Set Field" ; "" ; "find-one-by-primary-key" )` ]
+37. `End If`
+38. `Perform Find`
+39. `Set Variable` [ `$findError` ; Value: `Get ( LastError )` ]
+40. `Set Variable` [ `$foundCount` ; Value: `Get ( FoundCount )` ]
+41. `If` [ `$findError = 401 or $foundCount = 0` ]
+42. `Exit Script` [ Result: `SYN_Result ( False ; "RECORD_NOT_FOUND" ; "No matching task was found." ; "null" ; If ( $findError = 0 ; "" ; $findError ) ; "Perform Find" ; "" ; "update-record" )` ]
+43. `End If`
+44. `If` [ `$findError ≠ 0 or $foundCount ≠ 1` ]
+45. `Exit Script` [ Result: `SYN_Result ( False ; If ( $foundCount > 1 ; "PRIMARY_KEY_NOT_UNIQUE" ; "FIND_FAILED" ) ; "The primary-key find did not resolve exactly one task." ; "null" ; If ( $findError = 0 ; "" ; $findError ) ; "Perform Find" ; "" ; "update-record" )` ]
+46. `End If`
+47. `Open Record/Request`
+48. `Set Variable` [ `$openError` ; Value: `Get ( LastError )` ]
+49. `If` [ `$openError = 301 or $openError = 302` ]
+50. `Set Variable` [ `$lastRetryError` ; Value: `$openError` ]
+51. `Set Variable` [ `$lastRetryStep` ; Value: `"Open Record/Request"` ]
+52. `Exit Loop If` [ `$attempt ≥ 2` ]
 53. `Else`
-54. `Set Variable` [ `$replayResult` ; Value: `JSONSetElement ( SYN_TASK__by_id::SYN_LastResultJson ; "data.replayed" ; True ; JSONBoolean )` ]
-55. `Revert Record/Request` [ With dialog: Off ]
-56. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-57. `If` [ `$revertError ≠ 0` ]
-58. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The duplicate request result could not release the record." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
-59. `End If`
-60. `Exit Script` [ Result: `$replayResult` ]
-61. `End If`
-62. `End If`
-63. `If` [ `SYN_TASK__by_id::SYN_Version ≠ $expectedVersion` ]
-64. `Revert Record/Request` [ With dialog: Off ]
-65. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-66. `If` [ `$revertError ≠ 0` ]
-67. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The version-conflict branch could not release the record." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
-68. `End If`
-69. `Exit Script` [ Result: `SYN_Result ( False ; "OPTIMISTIC_LOCK_CONFLICT" ; "The task version changed." ; "null" ; "" ; "SYN_Version" ; "" ; "update-record" )` ]
-70. `End If`
-71. `Set Variable` [ `$beforeStatus` ; Value: `SYN_TASK__by_id::SYN_Status` ]
-72. `Set Variable` [ `$successResult` ; Value: `SYN_Result ( True ; "UPDATED" ; "" ; JSONSetElement ( "{}" ; [ "taskId" ; $taskId ; JSONNumber ] ; [ "beforeStatus" ; $beforeStatus ; JSONString ] ; [ "afterStatus" ; $newStatus ; JSONString ] ; [ "version" ; $expectedVersion + 1 ; JSONNumber ] ; [ "replayed" ; False ; JSONBoolean ] ) ; "" ; "" ; "" ; "update-record" )` ]
-73. `Set Field` [ `SYN_TASK__by_id::SYN_Status` ; `$newStatus` ]
-74. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
-75. `If` [ `$fieldError ≠ 0` ]
+54. `If` [ `$openError ≠ 0` ]
+55. `Exit Script` [ Result: `SYN_Result ( False ; If ( $openError = 200 or $openError = 201 or $openError = 202 ; "PRIVILEGE_DENIED" ; "OPEN_FAILED" ) ; "The task could not be opened for update." ; "null" ; $openError ; "Open Record/Request" ; "" ; "update-record" )` ]
+56. `End If`
+57. `If` [ `SYN_TASK__by_id::SYN_LastRequestId = $requestId` ]
+58. `If` [ `SYN_TASK__by_id::SYN_LastRequestJson ≠ $request` ]
+59. `Revert Record/Request` [ With dialog: Off ]
+60. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+61. `If` [ `$revertError ≠ 0` ]
+62. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The duplicate-request check could not release the record." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
+63. `End If`
+64. `Exit Script` [ Result: `SYN_Result ( False ; "DUPLICATE_REQUEST" ; "The request ID was reused with different input." ; "null" ; "" ; "SYN_LastRequestJson" ; "" ; "perform-script-on-server" )` ]
+65. `Else`
+66. `Set Variable` [ `$replayResult` ; Value: `JSONSetElement ( SYN_TASK__by_id::SYN_LastResultJson ; "data.replayed" ; True ; JSONBoolean )` ]
+67. `Revert Record/Request` [ With dialog: Off ]
+68. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+69. `If` [ `$revertError ≠ 0` ]
+70. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The duplicate request result could not release the record." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
+71. `End If`
+72. `Exit Script` [ Result: `$replayResult` ]
+73. `End If`
+74. `End If`
+75. `If` [ `SYN_TASK__by_id::SYN_Version ≠ $expectedVersion` ]
 76. `Revert Record/Request` [ With dialog: Off ]
 77. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-78. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed status update could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The status field could not be set." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
-79. `End If`
-80. `Set Field` [ `SYN_TASK__by_id::SYN_Version` ; `$expectedVersion + 1` ]
-81. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
-82. `If` [ `$fieldError ≠ 0` ]
-83. `Revert Record/Request` [ With dialog: Off ]
-84. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-85. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed version update could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The version field could not be set." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
-86. `End If`
-87. `Set Field` [ `SYN_TASK__by_id::SYN_LastRequestId` ; `$requestId` ]
-88. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
-89. `If` [ `$fieldError ≠ 0` ]
-90. `Revert Record/Request` [ With dialog: Off ]
-91. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-92. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed request ID update could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The request ID could not be stored." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
-93. `End If`
-94. `Set Field` [ `SYN_TASK__by_id::SYN_LastRequestJson` ; `$request` ]
-95. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
-96. `If` [ `$fieldError ≠ 0` ]
-97. `Revert Record/Request` [ With dialog: Off ]
-98. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-99. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed request snapshot could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The request snapshot could not be stored." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
-100. `End If`
-101. `Set Field` [ `SYN_TASK__by_id::SYN_LastResultJson` ; `$successResult` ]
-102. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
-103. `If` [ `$fieldError ≠ 0` ]
-104. `Revert Record/Request` [ With dialog: Off ]
-105. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-106. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed result snapshot could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The result snapshot could not be stored." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
-107. `End If`
-108. `Commit Records/Requests` [ With dialog: Off ]
-109. `Set Variable` [ `$commitError` ; Value: `Get ( LastError )` ]
-110. `If` [ `$commitError = 0` ]
-111. `Exit Script` [ Result: `$successResult` ]
-112. `Else`
-113. `Revert Record/Request` [ With dialog: Off ]
-114. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
-115. `If` [ `$revertError ≠ 0` ]
-116. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed Commit could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
-117. `End If`
-118. `If` [ `$commitError = 512` ]
-119. `Set Variable` [ `$lastRetryError` ; Value: `$commitError` ]
-120. `Set Variable` [ `$lastRetryStep` ; Value: `"Commit Records/Requests"` ]
-121. `Exit Loop If` [ `$attempt ≥ 2` ]
-122. `Else`
-123. `Exit Script` [ Result: `SYN_Result ( False ; "COMMIT_FAILED" ; "The task update could not be committed." ; "null" ; $commitError ; "Commit Records/Requests" ; "" ; "update-record" )` ]
-124. `End If`
-125. `End If`
-126. `End If`
-127. `End Loop`
-128. `Exit Script` [ Result: `SYN_Result ( False ; "RETRY_EXHAUSTED" ; "The update remained locked or conflicted after two attempts." ; JSONSetElement ( "{}" ; [ "attempts" ; $attempt ; JSONNumber ] ) ; $lastRetryError ; $lastRetryStep ; "" ; "update-record" )` ]
+78. `If` [ `$revertError ≠ 0` ]
+79. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The version-conflict branch could not release the record." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
+80. `End If`
+81. `Exit Script` [ Result: `SYN_Result ( False ; "OPTIMISTIC_LOCK_CONFLICT" ; "The task version changed." ; "null" ; "" ; "SYN_Version" ; "" ; "update-record" )` ]
+82. `End If`
+83. `Set Variable` [ `$beforeStatus` ; Value: `SYN_TASK__by_id::SYN_Status` ]
+84. `Set Variable` [ `$successResult` ; Value: `SYN_Result ( True ; "UPDATED" ; "" ; JSONSetElement ( "{}" ; [ "taskId" ; $taskId ; JSONNumber ] ; [ "beforeStatus" ; $beforeStatus ; JSONString ] ; [ "afterStatus" ; $newStatus ; JSONString ] ; [ "version" ; $expectedVersion + 1 ; JSONNumber ] ; [ "replayed" ; False ; JSONBoolean ] ) ; "" ; "" ; "" ; "update-record" )` ]
+85. `Set Field` [ `SYN_TASK__by_id::SYN_Status` ; `$newStatus` ]
+86. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
+87. `If` [ `$fieldError ≠ 0` ]
+88. `Revert Record/Request` [ With dialog: Off ]
+89. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+90. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed status update could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The status field could not be set." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
+91. `End If`
+92. `Set Field` [ `SYN_TASK__by_id::SYN_Version` ; `$expectedVersion + 1` ]
+93. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
+94. `If` [ `$fieldError ≠ 0` ]
+95. `Revert Record/Request` [ With dialog: Off ]
+96. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+97. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed version update could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The version field could not be set." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
+98. `End If`
+99. `Set Field` [ `SYN_TASK__by_id::SYN_LastRequestId` ; `$requestId` ]
+100. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
+101. `If` [ `$fieldError ≠ 0` ]
+102. `Revert Record/Request` [ With dialog: Off ]
+103. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+104. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed request ID update could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The request ID could not be stored." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
+105. `End If`
+106. `Set Field` [ `SYN_TASK__by_id::SYN_LastRequestJson` ; `$request` ]
+107. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
+108. `If` [ `$fieldError ≠ 0` ]
+109. `Revert Record/Request` [ With dialog: Off ]
+110. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+111. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed request snapshot could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The request snapshot could not be stored." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
+112. `End If`
+113. `Set Field` [ `SYN_TASK__by_id::SYN_LastResultJson` ; `$successResult` ]
+114. `Set Variable` [ `$fieldError` ; Value: `Get ( LastError )` ]
+115. `If` [ `$fieldError ≠ 0` ]
+116. `Revert Record/Request` [ With dialog: Off ]
+117. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+118. `Exit Script` [ Result: `If ( $revertError ≠ 0 ; SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed result snapshot could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" ) ; SYN_Result ( False ; "FIELD_ASSIGNMENT_FAILED" ; "The result snapshot could not be stored." ; "null" ; $fieldError ; "Set Field" ; "" ; "update-record" ) )` ]
+119. `End If`
+120. `Commit Records/Requests` [ With dialog: Off ]
+121. `Set Variable` [ `$commitError` ; Value: `Get ( LastError )` ]
+122. `If` [ `$commitError = 0` ]
+123. `Exit Script` [ Result: `$successResult` ]
+124. `Else`
+125. `Revert Record/Request` [ With dialog: Off ]
+126. `Set Variable` [ `$revertError` ; Value: `Get ( LastError )` ]
+127. `If` [ `$revertError ≠ 0` ]
+128. `Exit Script` [ Result: `SYN_Result ( False ; "CLEANUP_FAILED" ; "The failed Commit could not be reverted." ; "null" ; $revertError ; "Revert Record/Request" ; "" ; "update-record" )` ]
+129. `End If`
+130. `If` [ `$commitError = 512` ]
+131. `Set Variable` [ `$lastRetryError` ; Value: `$commitError` ]
+132. `Set Variable` [ `$lastRetryStep` ; Value: `"Commit Records/Requests"` ]
+133. `Exit Loop If` [ `$attempt ≥ 2` ]
+134. `Else`
+135. `Exit Script` [ Result: `SYN_Result ( False ; "COMMIT_FAILED" ; "The task update could not be committed." ; "null" ; $commitError ; "Commit Records/Requests" ; "" ; "update-record" )` ]
+136. `End If`
+137. `End If`
+138. `End If`
+139. `End Loop`
+140. `Exit Script` [ Result: `SYN_Result ( False ; "RETRY_EXHAUSTED" ; "The update remained locked or conflicted after two attempts." ; JSONSetElement ( "{}" ; [ "attempts" ; $attempt ; JSONNumber ] ) ; $lastRetryError ; $lastRetryStep ; "" ; "update-record" )` ]
 
 ## Error branches
 
@@ -385,9 +420,13 @@ delete、create、schema変更、credential参照の権限は不要です。
 | `VALIDATION_HELPER_FAILED` | helper scriptの呼出しerror | call errorを保持し、inputを未検証のまま使用しない |
 | `PSOS_CALL_FAILED` | caller-side PSOS error | server business successを推測せず終了 |
 | `INVALID_SERVER_RESULT` | server resultが共通contract外 | invalid resultとして終了 |
+| `CONTEXT_SETUP_FAILED` | `Go to Layout` error | findへ進まず、layout errorを保持して終了 |
+| `FIND_MODE_FAILED` | `Enter Find Mode` error | criteriaを設定せず、mode errorを保持して終了 |
+| `FIND_CRITERIA_FAILED` | find条件用`Set Field` error | findを実行せず、field errorを保持して終了 |
 | `RECORD_NOT_FOUND` | error 401または0件 | updateせず終了 |
 | `PRIMARY_KEY_NOT_UNIQUE` | 2件以上 | 任意recordを選ばず終了 |
-| `RECORD_LOCKED` | open error 301／302 | 全contextを再構築し最大2 attempt |
+| `FIND_FAILED` | 401以外のfind errorまたはexactly-one判定失敗 | updateせず、find errorを保持して終了 |
+| `PRIVILEGE_DENIED`／`OPEN_FAILED` | non-retryableな`Open Record/Request` error | writeせず、error 200／201／202はprivilege failureとして分離 |
 | `DUPLICATE_REQUEST` | 同じrequest IDが異なる正規化済みrequestで再利用された | writeせずcallerにrequest ID再利用を訂正させる |
 | `OPTIMISTIC_LOCK_CONFLICT` | current versionが`expectedVersion`と不一致 | retryせずcallerにreloadを要求 |
 | `FIELD_ASSIGNMENT_FAILED` | `Set Field` error | Revert結果を確認して終了 |
@@ -395,7 +434,7 @@ delete、create、schema変更、credential参照の権限は不要です。
 | `RETRY_EXHAUSTED` | open error 301／302またはCommit error 512が2回 | 最後のerrorとstepを保持し、追加retryを行わず終了 |
 | `CLEANUP_FAILED` | Revert error | original operationをsuccess扱いせず人間確認 |
 
-numeric errorの分類は既存[`update-record/pattern.json`](../../../patterns/fm19.5/update-record/pattern.json)のsource-backed candidate boundaryを継承し、FileMaker 19.5実機結果を保証しません。
+open error 301／302とCommit error 512は返却application codeではなく内部retry条件です。1回目は全contextを再構築し、2回目にも継続した場合だけ`RETRY_EXHAUSTED`を返します。numeric errorの分類は既存[`update-record/pattern.json`](../../../patterns/fm19.5/update-record/pattern.json)と登録済み`claris-fm19-error-codes`のFileMaker Pro 19 archive boundaryを継承し、FileMaker 19.5実機結果を保証しません。
 
 ## Commit／Revert design
 
@@ -432,12 +471,18 @@ primary-key findの後に`Open Record/Request`を実行します。open lockはs
 | malformed input | `client` | malformed JSON | helperの`INVALID_JSON`、PSOS未実行 |
 | not found | `psos` | `taskId = 9999` | `RECORD_NOT_FOUND`、writeなし |
 | duplicate primary key | `psos` | 合成testでID 1001を2件作る | `PRIMARY_KEY_NOT_UNIQUE`、writeなし |
-| record lock | `psos` | 別sessionがrecordをopen | 2 attempt後`RETRY_EXHAUSTED` |
+| target layout missing／unavailable | `psos` | test copyで`SYN_Task_Server`を削除、rename、または利用不可にする | `CONTEXT_SETUP_FAILED`、find／writeなし |
+| Enter Find Mode failure | `psos` | test copyで`Enter Find Mode` failureを発生させる | `FIND_MODE_FAILED`、criteria／writeなし |
+| find criterion assignment failure | `psos` | test copyで`SYN_TaskId`を設定不可にする | `FIND_CRITERIA_FAILED`、find／writeなし |
+| record lock then success | `psos` | attempt 1だけopen error 301または302、attempt 2でlock解放 | attempt 2で`UPDATED` |
+| record lock exhaustion | `psos` | open error 301または302が2 attempt継続 | `RETRY_EXHAUSTED`、最後のerrorと`Open Record/Request`を保持 |
 | stale version | `psos` | current version 8、expected 7 | `OPTIMISTIC_LOCK_CONFLICT` |
 | duplicate request | `psos` | `SYN_LastRequestId = "SYN_REQ_0001"`かつ保存requestが同一 | 保存済み`UPDATED`、`replayed = true`、追加writeなし |
 | request ID reuse | `psos` | 同じrequest ID、異なる`newStatus` | `DUPLICATE_REQUEST`、writeなし |
 | privilege | `psos` | edit privilegeなしの合成privilege copy | `PRIVILEGE_DENIED`、sensitive detailなし |
-| Commit failure | `psos` | 合成validation failureを発生 | non-success result、Revert resultを確認 |
+| Commit 512 then success | `psos` | attempt 1だけCommit error 512、Revert成功、version条件を維持してattempt 2はCommit成功 | attempt 2で`UPDATED` |
+| Commit 512 exhaustion | `psos` | Commit error 512が2 attempt継続し、各Revertは成功 | `RETRY_EXHAUSTED`、最後のerrorと`Commit Records/Requests`を保持 |
+| non-retryable Commit failure | `psos` | 512以外のCommit errorを発生 | `COMMIT_FAILED`、Revert resultを確認 |
 | invalid server result | `client` | server test doubleがcontract外result | `INVALID_SERVER_RESULT` |
 
 これらは将来実機で実施するtest designであり、実行済みresultではありません。

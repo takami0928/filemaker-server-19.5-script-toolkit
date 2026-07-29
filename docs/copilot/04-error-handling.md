@@ -8,7 +8,7 @@
 4. 保存したFileMaker errorとapplication側の判定を別々に分類する。
 5. normal pathとerror pathの双方で共通JSON resultを返す。
 
-未知のerror code、FileMaker 19.5で裏付けられていない番号や意味を捏造しません。numeric errorを設計へ使う場合は、既存patternのsource-backed候補または登録済みsourceへ境界を示します。current error表だけを根拠に19.5固有動作を保証しません。
+未知のerror code、FileMaker 19.5で裏付けられていない番号や意味を捏造しません。numeric errorを設計へ使う場合は、既存patternまたは登録済みのFileMaker Pro 19 archiveへ境界を示します。archiveで番号と意味を確認できても、対象file、privilege、同時実行条件でのruntime動作までは保証しません。
 
 ## Common result contract
 
@@ -34,4 +34,4 @@ FileMaker errorは`error.fileMakerCode`へ保持し、業務上のapplication co
 
 ## Source IDs
 
-Source IDs: `claris-fm19-script-steps-reference`, `claris-fm19-function-get-lasterror`, `claris-fm19-function-jsonsetelement`, `claris-fm19-function-get-scriptresult`, `claris-current-error-codes`
+Source IDs: `claris-fm19-script-steps-reference`, `claris-fm19-function-get-lasterror`, `claris-fm19-function-jsonsetelement`, `claris-fm19-function-get-scriptresult`, `claris-fm19-error-codes`

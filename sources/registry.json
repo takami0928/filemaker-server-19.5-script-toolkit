@@ -245,6 +245,17 @@
       "status": "archived"
     },
     {
+      "id": "claris-fm19-error-codes",
+      "title": "FileMaker error codes",
+      "url": "https://help.claris.com/archive/fm19/en/pro-help/content/error-codes.html",
+      "sourceType": "primary",
+      "publisher": "Claris International",
+      "targetVersion": "FileMaker Pro 19 archive",
+      "scope": "FileMaker 19 error code meanings used by design-only patterns and Copilot script designs",
+      "retrievedAt": "2026-07-30",
+      "status": "archived"
+    },
+    {
       "id": "claris-current-error-codes",
       "title": "FileMaker error codes",
       "url": "https://help.claris.com/en/pro-help/content/error-codes.html",

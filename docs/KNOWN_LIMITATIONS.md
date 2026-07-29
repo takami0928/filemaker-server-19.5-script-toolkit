@@ -9,7 +9,7 @@
 - XML、Script IR、clipboardは副次的で凍結された実験機能である。初期レンダラーは少数の制御・変数ステップだけを対象とする。
 - 互換性カタログ59件は公開資料を正規化した`documented`参照であり、FileMaker Pro／Server 19.5実機検証やXML生成対応を意味しない。
 - Phase Bの5パターンは設計用の`design_only`雛形であり、完成スクリプト、Script IR、XMLテンプレート、FileMaker実機証拠ではない。
-- パターンが使用する関数とエラー番号だけをIssue #7候補から照合しており、関数／エラー／環境別ガイダンス全体を正規カタログへ昇格していない。現在版エラー表の番号・意味は、凍結した19.5-era資料での再確認が残る。
+- packageと5パターンで使用する主要numeric error codeは、FileMaker Pro 19公式archiveの番号と意味に照合済みである。これはFileMaker実機runtime検証ではなく、19.5.x patch固有動作、対象fileのvalidation／privilege、同時実行時のlock／conflict挙動は引き続き未検証である。source-backed error codeとruntime evidenceを混同しない。
 - パターン集はruntime APIを提供しないリポジトリ設計資料であり、現時点のwheelには同梱しない。
 - 必須プレースホルダーが未解決なら完成スクリプトを出力できない。任意のidempotency fieldやversion fieldも存在を推測せず、確認できなければ機能ごと省略する。
 - 未解決事項が存在すること自体は、一律のblocking条件ではない。採用した設計を手作業実装するために必要な情報が未解決の場合だけ、`implementation_ready`を禁止する。
