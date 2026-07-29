@@ -2,9 +2,22 @@
 
 ## 対象の分離
 
-以下の自動検証状態は、既存の互換性データ、パターン、Script IR、XML、clipboard、配布wheelに関するものです。Copilot knowledge packageの完成度や、Copilotが生成する人間向け設計書の正しさを示しません。
+以下の自動検証状態は、Copilot knowledge packageの構造と参照、および既存の互換性データ、パターン、Script IR、XML、clipboard、配布wheelに関するものです。Copilotが生成する人間向け設計書の業務上の正しさやFileMaker runtimeを示しません。
 
-`docs/copilot/`、SharePoint配布パッケージ、SharePoint統合運用、M365 Copilot受入試験はまだ存在または実施していません。
+`docs/copilot/` v0.1は作成済みです。SharePoint配布パッケージ、SharePoint統合運用、M365 Copilot pilot／受入試験はまだ存在または実施していません。
+
+## Copilot package自動検証
+
+- required package fileの存在
+- package内Markdownのrelative link先
+- source必須文書のSource IDsと両registryでの解決
+- packageと5パターンで使用する主要numeric error codeのSource IDが、FileMaker Pro 19公式archiveのregistry recordへ解決されること
+- package version `0.1.0`とtarget 19.5
+- output contractの6 completion-report dimensions
+- 合成例のCompatibility ledgerにあるstep、context、support、`partial`条件
+- FileMaker-format step listの全unique step／contextがledgerに存在すること
+
+これらはpackage structure、source ID、internal link、compatibility ledgerの自動検証です。archive本文との照合は独立したsource reviewであり、公開資料上のevidence boundaryです。FileMaker device validationは`not_run`です。
 
 ## 自動検証済み
 

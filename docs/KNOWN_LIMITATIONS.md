@@ -1,7 +1,7 @@
 # 既知の制約
 
-- Copilot向けの`docs/copilot/` knowledge packageはまだ作成していない。
-- SharePoint配布パッケージ、SharePoint上での公開知識と社内情報の統合運用、M365 Copilotの受入試験はまだ実施していない。
+- Copilot向けの`docs/copilot/` knowledge package v0.1は作成した。公開source、59-step互換性カタログ、5つの`design_only`パターン、完全な合成例に基づくが、source-backedであることはFileMaker runtime保証を意味しない。
+- SharePoint配布パッケージは未作成であり、SharePoint上での公開知識と社内情報の統合運用、M365 Copilot pilot、受入試験はまだ実施していない。
 - M365 Copilotが社内文書を正しく、完全に、最新状態として解釈することは保証しない。確認済み事実、仮定、不足情報の分離と人間レビューが必要である。
 - 公開知識と社内情報のライブラリ、権限、検索範囲の境界はSharePoint側でも別途設定する必要がある。このリポジトリだけでは境界を強制できない。
 - 中心成果物は人間向け設計書であり、FileMaker担当者によるScript Workspaceへの手作業実装、レビュー、テストが必要である。
@@ -9,7 +9,7 @@
 - XML、Script IR、clipboardは副次的で凍結された実験機能である。初期レンダラーは少数の制御・変数ステップだけを対象とする。
 - 互換性カタログ59件は公開資料を正規化した`documented`参照であり、FileMaker Pro／Server 19.5実機検証やXML生成対応を意味しない。
 - Phase Bの5パターンは設計用の`design_only`雛形であり、完成スクリプト、Script IR、XMLテンプレート、FileMaker実機証拠ではない。
-- パターンが使用する関数とエラー番号だけをIssue #7候補から照合しており、関数／エラー／環境別ガイダンス全体を正規カタログへ昇格していない。現在版エラー表の番号・意味は、凍結した19.5-era資料での再確認が残る。
+- packageと5パターンで使用する主要numeric error codeは、FileMaker Pro 19公式archiveの番号と意味に照合済みである。これはFileMaker実機runtime検証ではなく、19.5.x patch固有動作、対象fileのvalidation／privilege、同時実行時のlock／conflict挙動は引き続き未検証である。source-backed error codeとruntime evidenceを混同しない。
 - パターン集はruntime APIを提供しないリポジトリ設計資料であり、現時点のwheelには同梱しない。
 - 必須プレースホルダーが未解決なら完成スクリプトを出力できない。任意のidempotency fieldやversion fieldも存在を推測せず、確認できなければ機能ごと省略する。
 - 未解決事項が存在すること自体は、一律のblocking条件ではない。採用した設計を手作業実装するために必要な情報が未解決の場合だけ、`implementation_ready`を禁止する。

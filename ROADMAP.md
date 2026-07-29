@@ -9,7 +9,8 @@ This roadmap orders work by Copilot value delivery. The primary outcome is a hum
 - Internal source of truth: a separate SharePoint library or clearly segregated area
 - Policy: deny by default and do not infer missing FileMaker objects, privileges, business rules, or internal IDs
 - FileMaker Pro/Server 19.5 evidence: not yet collected
-- Copilot knowledge package and SharePoint distribution package: not yet created
+- Copilot knowledge package: this PR delivers v0.1 under `docs/copilot/`
+- SharePoint distribution package and M365 Copilot pilot: not yet created
 
 ## Foundation — completed
 
@@ -26,11 +27,11 @@ The following completed work remains the foundation for the Copilot-first path.
 
 Issue #3 also completed strict Script IR v2, deterministic v1 migration, installed-wheel checks, and conservative XML renderability rules. Those results remain as historical, maintained assets, but their expansion is now a deferred experimental track rather than a prerequisite for Copilot work.
 
-## Next — Copilot knowledge package
+## Current delivery — Copilot knowledge package v0.1
 
-Tracking: #8. This is the next central implementation step.
+Tracking: #8.
 
-The next PR will create `docs/copilot/` as a small set of Markdown documents. That directory does not exist yet.
+This PR delivers `docs/copilot/` as a small set of bounded Markdown documents and a complete synthetic design example.
 
 - Keep one document focused on one purpose.
 - Explain execution-context selection across client, PSOS, server schedule, WebDirect, and other relevant contexts.
@@ -44,7 +45,7 @@ The next PR will create `docs/copilot/` as a small set of Markdown documents. Th
 
 Issue #7 continues only for unresolved FileMaker 19.5 knowledge that the Copilot package actually needs. Broad catalog completion, XML fixture capture, and unrelated research are not prerequisites for Issue #8.
 
-Exit condition: the public Markdown gives Copilot enough bounded guidance to produce a reviewable design without claiming that `docs/copilot/`, SharePoint integration, or FileMaker runtime evidence already exists.
+Exit condition: the public Markdown and deterministic package policy are internally consistent and independently reviewed without claiming SharePoint integration, Copilot pilot results, or FileMaker runtime evidence.
 
 ## Following — SharePoint package and pilot
 
@@ -89,7 +90,7 @@ The former dependency-ordered phases are retained here for traceability.
 | Phase 4 — AI evaluation suite | #6 | Deferred |
 | Phase 5 — Source-backed 19.5 catalog | #7 | Phase A and Phase B completed; further work is selective |
 | Phase 6 — Expand renderer coverage | — | Deferred |
-| Phase 7 — M365 Copilot knowledge package | #8 | Reordered as the next central implementation step |
+| Phase 7 — M365 Copilot knowledge package | #8 | This PR delivers v0.1; independent review and merge remain pending |
 | Phase 8 — FileMaker 19.5 hardware validation | — | Deferred and still required before any corresponding evidence promotion |
 
 ## Dependency rule

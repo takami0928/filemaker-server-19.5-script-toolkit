@@ -4,22 +4,23 @@ This repository is the public source of FileMaker Server 19.5 knowledge, decisio
 
 ## Required reading order
 
-1. [Purpose and scope](docs/PURPOSE.md)
-2. [AI usage contract](AI_GUIDE.md)
-3. [Roadmap](ROADMAP.md)
-4. [Compatibility catalog](docs/COMPATIBILITY_CATALOG.md)
-5. [Practical script patterns](patterns/README.md)
-6. [Script style](docs/SCRIPT_STYLE.md)
-7. [Server execution design](docs/SERVER_EXECUTION.md)
-8. [FileMaker Server 19.5 execution boundary](docs/FM_SERVER_19_5.md)
-9. [Known limitations](docs/KNOWN_LIMITATIONS.md)
-10. [Quality gates](QUALITY_GATES.md)
-11. [Evidence model](docs/EVIDENCE_MODEL.md)
-12. [Source policy](docs/SOURCE_POLICY.md)
-13. [Definition of Done](docs/DEFINITION_OF_DONE.md)
-14. [Script IR](docs/SCRIPT_IR.md)
-15. [XML and clipboard](docs/XML_CLIPBOARD.md)
-16. [Validation status](docs/VALIDATION_STATUS.md)
+1. [Copilot knowledge package](docs/copilot/README.md)
+2. [Purpose and scope](docs/PURPOSE.md)
+3. [AI usage contract](AI_GUIDE.md)
+4. [Roadmap](ROADMAP.md)
+5. [Compatibility catalog](docs/COMPATIBILITY_CATALOG.md)
+6. [Practical script patterns](patterns/README.md)
+7. [Script style](docs/SCRIPT_STYLE.md)
+8. [Server execution design](docs/SERVER_EXECUTION.md)
+9. [FileMaker Server 19.5 execution boundary](docs/FM_SERVER_19_5.md)
+10. [Known limitations](docs/KNOWN_LIMITATIONS.md)
+11. [Quality gates](QUALITY_GATES.md)
+12. [Evidence model](docs/EVIDENCE_MODEL.md)
+13. [Source policy](docs/SOURCE_POLICY.md)
+14. [Definition of Done](docs/DEFINITION_OF_DONE.md)
+15. [Script IR](docs/SCRIPT_IR.md)
+16. [XML and clipboard](docs/XML_CLIPBOARD.md)
+17. [Validation status](docs/VALIDATION_STATUS.md)
 
 Treat internal company documents as the source of facts about the target system. Treat this repository as the source of implementation rules. Do not invent tables, fields, table occurrences, layouts, scripts, privileges, or internal FileMaker object IDs.
 
@@ -36,6 +37,9 @@ Treat internal company documents as the source of facts about the target system.
 - Do not promote evidence without the metadata required by `docs/EVIDENCE_MODEL.md`.
 - Every compatibility or behavioral claim must reference IDs in its registered source registry. The normalized compatibility catalog uses `catalog/fm19.5/compatibility/sources.json`; other implementation claims use `sources/registry.json`.
 - Current documentation for later FileMaker versions must not be silently backported to 19.5.
+- Changes under `docs/copilot/` must preserve the required package files, valid
+  relative links, registered Source IDs, and catalog-backed Compatibility
+  ledger enforced by repository policy.
 - Clipboard output must remain unchanged after any validation failure.
 - Keep examples synthetic and free of company information.
 
@@ -71,6 +75,7 @@ Use only steps registered in `catalog/fm19.5/verified-steps.json`. Unknown XML m
 ```powershell
 python -m pip install -e .
 python scripts/check_repository.py
+python -m unittest tests.test_copilot_package_policy -v
 python -m unittest discover -s tests -v
 fms19 validate-ir examples/server-script-ir-v2.json
 fms19 migrate-ir examples/server-script-ir.json migrated-ir-v2.json

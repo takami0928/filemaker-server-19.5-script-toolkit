@@ -42,7 +42,9 @@
 
 既存実装は削除しませんが、明示的な再承認なしに拡張しません。XML／IR／clipboardは副次的な実験機能であり、FileMaker Pro／Server 19.5実機未検証です。
 
-Copilot向けの限定Markdownパッケージとなる`docs/copilot/`とSharePoint配布パッケージは、まだ存在しません。作成順序は[ロードマップ](ROADMAP.md)に記録しています。
+Copilot向け公開知識パッケージv0.1は、[`docs/copilot/README.md`](docs/copilot/README.md)をknowledge-first入口として提供します。FileMakerファイルや実機環境を使わず、公開資料、59-step互換性カタログ、5つの`design_only`パターン、完全な合成例だけで作成しています。
+
+SharePoint配布パッケージとM365 Copilot pilotは未作成・未実施です。FileMaker Pro／Server 19.5実機検証も未実施で、XMLは引き続きformal outputではありません。次工程は[ロードマップ](ROADMAP.md)のIssue #15です。
 
 ## 情報の役割分担
 
@@ -93,10 +95,11 @@ Copilot向けの限定Markdownパッケージとなる`docs/copilot/`とSharePoi
 
 最初に次を確認します。
 
-1. [目的と責任範囲](docs/PURPOSE.md)でGitHub、SharePoint、Copilotの境界を確認する。
-2. [AI利用契約](AI_GUIDE.md)で設計書の処理順、出力形式、停止条件を確認する。
-3. [FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)で実行コンテキスト別の互換性を確認する。
-4. [5つの実用パターン](patterns/README.md)を設計の構成要素として利用する。
+1. [Copilot knowledge package v0.1](docs/copilot/README.md)を公開知識の入口として読む。
+2. [目的と責任範囲](docs/PURPOSE.md)でGitHub、SharePoint、Copilotの境界を確認する。
+3. [AI利用契約](AI_GUIDE.md)で設計書の処理順、出力形式、停止条件を確認する。
+4. [FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)で実行コンテキスト別の互換性を確認する。
+5. [5つの実用パターン](patterns/README.md)を設計の構成要素として利用する。
 
 互換性CLIを使う場合は、次を実行します。
 
@@ -223,6 +226,7 @@ Win32クリップボードAPIを使う`clipboard-read`、`clipboard-write`、`cl
 
 ## 技術ドキュメント
 
+- [Copilot knowledge package v0.1](docs/copilot/README.md)
 - [目的と責任範囲](docs/PURPOSE.md)
 - [AI利用契約](AI_GUIDE.md)
 - [FileMaker 19.5互換性カタログ](docs/COMPATIBILITY_CATALOG.md)
